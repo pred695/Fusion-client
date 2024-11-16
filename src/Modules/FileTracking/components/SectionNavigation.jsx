@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { Group, Text, Box, Container } from "@mantine/core";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 // eslint-disable-next-line import/no-unresolved
+import { useDispatch } from "react-redux";
 import Compose from "./ComposeFile";
 import Outboxfunc from "./Outbox";
 import Inboxfunc from "./Inbox";
 import Track from "./Track";
 import Draft from "./Drafts";
 import ArchiveFiles from "./Archive";
+import { setActiveTab_ } from "../../../redux/moduleslice";
 
 const sections = [
   "Compose File",
@@ -29,8 +31,12 @@ const sectionComponents = {
 };
 
 export default function SectionNavigation() {
+  const dispatch = useDispatch();
   const [activeSection, setActiveSection] = useState("Compose File");
-
+  const handleSelection = (section) => {
+    setActiveSection(section);
+    dispatch(setActiveTab_(section));
+  };
   // Get the component for the active section
   const ActiveComponent = sectionComponents[activeSection];
 
@@ -49,7 +55,7 @@ export default function SectionNavigation() {
               size="sm"
               color={activeSection === section ? "#4299E1" : "#718096"}
               style={{ cursor: "pointer", whiteSpace: "nowrap" }}
-              onClick={() => setActiveSection(section)}
+              onClick={() => handleSelection(section)}
             >
               {section}
             </Text>

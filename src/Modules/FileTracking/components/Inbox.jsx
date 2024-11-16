@@ -10,11 +10,16 @@ import {
 } from "@mantine/core";
 import { Archive, Eye } from "@phosphor-icons/react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import View from "./ViewFile";
 
 export default function Inboxfunc() {
   const [files, setFiles] = useState([]);
   const token = localStorage.getItem("authToken");
+  const role = useSelector((state) => state.user.role);
+  const username = useSelector((state) => state.user.name);
+  let current_module = useSelector((state) => state.module.current_module);
+  current_module = current_module.split(" ").join("").toLowerCase();
   useEffect(() => {
     const getFiles = async () => {
       try {
@@ -23,9 +28,9 @@ export default function Inboxfunc() {
 
           {
             params: {
-              username: "atul",
-              designation: "Professor",
-              src_module: "filetracking",
+              username,
+              designation: role,
+              src_module: current_module,
             },
             withCredentials: true,
             headers: {

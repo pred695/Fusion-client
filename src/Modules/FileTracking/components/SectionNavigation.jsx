@@ -53,7 +53,7 @@ export default function SectionNavigation() {
           <React.Fragment key={section}>
             <Text
               size="sm"
-              color={activeSection === section ? "#4299E1" : "#718096"}
+              color={activeSection === section ? "#15ABFF" : "#718096"}
               style={{ cursor: "pointer", whiteSpace: "nowrap" }}
               onClick={() => handleSelection(section)}
             >

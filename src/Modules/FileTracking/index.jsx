@@ -1,11 +1,15 @@
 import React from "react";
 import { useMantineTheme } from "@mantine/core";
+import { useDispatch } from "react-redux";
 import SectionNavigation from "./components/sectionNavigation";
 import CustomBreadcrumbs from "../../components/Breadcrumbs";
+import { setActiveTab_, setCurrentModule } from "../../redux/moduleslice";
 
 function FileTracking() {
   const theme = useMantineTheme();
-
+  const dispatch = useDispatch();
+  dispatch(setCurrentModule("File Tracking"));
+  dispatch(setActiveTab_("Compose File"));
   return (
     <>
       <CustomBreadcrumbs />

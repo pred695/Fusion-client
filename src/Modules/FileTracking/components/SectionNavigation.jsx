@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Group, Text, Box, Container } from "@mantine/core";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
@@ -33,10 +32,25 @@ const sectionComponents = {
 export default function SectionNavigation() {
   const dispatch = useDispatch();
   const [activeSection, setActiveSection] = useState("Compose File");
+
   const handleSelection = (section) => {
     setActiveSection(section);
     dispatch(setActiveTab_(section));
   };
+
+  const navigateLeft = () => {
+    const currentIndex = sections.indexOf(activeSection);
+    const previousIndex =
+      (currentIndex - 1 + sections.length) % sections.length; // Wrap around to the last tab
+    handleSelection(sections[previousIndex]);
+  };
+
+  const navigateRight = () => {
+    const currentIndex = sections.indexOf(activeSection);
+    const nextIndex = (currentIndex + 1) % sections.length; // Wrap around to the first tab
+    handleSelection(sections[nextIndex]);
+  };
+
   // Get the component for the active section
   const ActiveComponent = sectionComponents[activeSection];
 
@@ -44,29 +58,73 @@ export default function SectionNavigation() {
     <Container size="xl" p="xs">
       {/* Section navigation */}
       <Group
-        spacing="xs"
+        spacing={0}
         noWrap
-        style={{ overflowX: "auto", padding: "8px 0" }}
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          padding: "8px 0",
+          borderBottom: "2px solid #E2E8F0",
+        }}
       >
-        <CaretLeft size={20} weight="bold" color="#718096" />
-        {sections.map((section, index) => (
-          <React.Fragment key={section}>
-            <Text
-              size="sm"
-              color={activeSection === section ? "#15ABFF" : "#718096"}
-              style={{ cursor: "pointer", whiteSpace: "nowrap" }}
-              onClick={() => handleSelection(section)}
-            >
-              {section}
-            </Text>
-            {index < sections.length - 1 && (
-              <Text color="#CBD5E0" size="sm">
-                |
-              </Text>
-            )}
-          </React.Fragment>
+        {/* Left arrow button */}
+        <button
+          onClick={navigateLeft}
+          style={{
+            background: "#E2E8F0",
+            border: "1.5px solid black",
+            cursor: "pointer",
+            padding: "8px",
+            borderRadius: "50%",
+            outline: "none",
+            margin: "0 8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CaretLeft size={20} weight="bold" color="#4A5568" />
+        </button>
+        {sections.map((section) => (
+          <Text
+            key={section}
+            size="sm"
+            style={{
+              cursor: "pointer",
+              padding: "8px 16px",
+              whiteSpace: "nowrap",
+              margin: "0",
+              color: activeSection === section ? "#007ACC" : "#000000",
+              fontWeight: activeSection === section ? "600" : "normal",
+              borderBottom:
+                activeSection === section
+                  ? "2.5px solid #007ACC"
+                  : "2px solid transparent",
+              transition: "border-bottom 0.3s, color 0.3s",
+            }}
+            onClick={() => handleSelection(section)}
+          >
+            {section}
+          </Text>
         ))}
-        <CaretRight size={20} weight="bold" color="#718096" />
+        {/* Right arrow button */}
+        <button
+          onClick={navigateRight}
+          style={{
+            background: "#E2E8F0",
+            border: "1.5px solid black", // Black border added
+            cursor: "pointer",
+            padding: "8px",
+            borderRadius: "50%",
+            outline: "none",
+            margin: "0 8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CaretRight size={20} weight="bold" color="#4A5568" />
+        </button>
       </Group>
 
       {/* Render the active section component */}

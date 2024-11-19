@@ -6,7 +6,6 @@ import {
   Table,
   ActionIcon,
   Tooltip,
-  Badge,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { ArrowArcLeft, Archive, Eye } from "@phosphor-icons/react";
@@ -49,7 +48,7 @@ export default function ArchiveFiles() {
       color: "blue",
     });
     const updatedFiles = files.map((file) =>
-      file.fileID === fileID ? { ...file, archived: !file.archived } : file,
+      file.fileID === fileID ? { ...file, archived: !file.archived } : file
     );
     setFiles(updatedFiles);
   };
@@ -74,7 +73,7 @@ export default function ArchiveFiles() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
@@ -104,8 +103,8 @@ export default function ArchiveFiles() {
             style={{ width: "100%", tableLayout: "fixed" }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
-                <th style={{ ...tableStyles, width: "7%" }}>Unarchive</th>
+              <tr style={{ backgroundColor: "#0000" }}>
+                <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
                 <th style={tableStyles}>Received as</th>
                 <th style={tableStyles}>Sent by</th>
                 <th style={tableStyles}>File ID</th>
@@ -125,7 +124,7 @@ export default function ArchiveFiles() {
                     >
                       <ActionIcon
                         variant="light"
-                        color={file.archived ? "red" : "green"}
+                        color={file.archived ? "red" : "blue"}
                         onClick={() => handleToggleArchive(file.fileID)}
                         style={{ width: "2rem", height: "2rem" }}
                       >
@@ -144,9 +143,7 @@ export default function ArchiveFiles() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td style={tableStyles}>{file.sentBy}</td>
                   <td style={tableStyles}>{file.fileID}</td>
@@ -155,7 +152,7 @@ export default function ArchiveFiles() {
                   <td style={tableStyles}>
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       onClick={() => handleViewFile(file)}
                       style={{ width: "2rem", height: "2rem" }}
                     >

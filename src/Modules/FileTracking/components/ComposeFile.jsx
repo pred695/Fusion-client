@@ -9,15 +9,39 @@ import {
   Title,
   ActionIcon,
   Text,
+  Select,
 } from "@mantine/core";
 import { Upload, FloppyDisk } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
+import { useForm } from "@mantine/form";
 
 export default function Compose() {
+  const form = useForm({
+    initialValues: {
+      title: "",
+      description: "",
+      createAs: "",
+      file: null,
+      remark: "",
+      forwardTo: "",
+      receiverDesignation: "",
+    },
+    validate: {
+      file: (value) => (value ? null : "File is required"),
+    },
+  });
+
   const handleSaveDraft = () => {
     notifications.show({
       title: "Draft Saved",
       message: "File has been saved as draft",
+    });
+  };
+
+  const handleSubmit = (values) => {
+    notifications.show({
+      title: "File Submitted",
+      message: `File with title "${values.title}" has been successfully submitted.`,
     });
   };
 
@@ -27,7 +51,11 @@ export default function Compose() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", position: "relative" }}
+      style={{
+        backgroundColor: "#F5F7F8",
+        position: "relative",
+        margin: "32px",
+      }}
     >
       {/* Icon at Top Right with Text Beneath */}
       <Box
@@ -59,7 +87,7 @@ export default function Compose() {
       </Title>
       <Box
         component="form"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={form.onSubmit(handleSubmit)}
         style={{
           backgroundColor: "#F5F7F8",
           padding: "16px",
@@ -69,30 +97,59 @@ export default function Compose() {
           label="Title of File"
           placeholder="Enter file title"
           mb="sm"
+          {...form.getInputProps("title")}
         />
-        <Textarea label="Description" placeholder="Enter description" mb="sm" />
+        <Textarea
+          label="Description"
+          placeholder="Enter description"
+          mb="sm"
+          {...form.getInputProps("description")}
+        />
         <TextInput
           label="Create as"
           placeholder="Enter creation type"
           mb="sm"
+          {...form.getInputProps("createAs")}
         />
         <FileInput
-          label="Attach file (PDF, JPG, PNG) (MAX: 10MB)"
+          label={
+            <span>
+              Attach file (PDF, JPG, PNG) (MAX: 10MB)
+              <Text color="red" component="span">
+                {" "}
+                *
+              </Text>
+            </span>
+          }
           placeholder="Upload file"
           accept="application/pdf,image/jpeg,image/png"
           icon={<Upload size={14} />}
           mb="sm"
+          {...form.getInputProps("file")}
+          error={form.errors.file}
         />
-        <Textarea label="Remark" placeholder="Enter remark" mb="sm" />
+        <Textarea
+          label="Remark"
+          placeholder="Enter remark"
+          mb="sm"
+          {...form.getInputProps("remark")}
+        />
         <TextInput
           label="Forward To"
           placeholder="Enter forward recipient"
           mb="sm"
+          {...form.getInputProps("forwardTo")}
         />
-        <TextInput
+        <Select
           label="Receiver Designation"
-          placeholder="Enter receiver designation"
+          placeholder="Select designation"
           mb="sm"
+          data={[
+            { value: "Professor", label: "Professor" },
+            { value: "Student", label: "Student" },
+            { value: "Employee", label: "Employee" },
+          ]}
+          {...form.getInputProps("receiverDesignation")}
         />
 
         <Button

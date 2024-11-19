@@ -1,15 +1,8 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Card,
-  Title,
-  Table,
-  Badge,
-  ActionIcon,
-  Tooltip,
-} from "@mantine/core";
+import { Box, Card, Title, Table, Tooltip, ActionIcon } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { ArrowArcRight, Eye } from "@phosphor-icons/react";
-import ViewFiles from "./viewFile";
+import ViewFiles from "./ViewFile";
 
 export default function Outboxfunc() {
   const [files] = useState([
@@ -29,8 +22,12 @@ export default function Outboxfunc() {
     },
   ]);
 
-  // State to manage the selected file for viewing
   const [selectedFile, setSelectedFile] = useState(null);
+
+  // Mantine form for forward (if needed for future enhancements)
+  const form = useForm({
+    initialValues: {},
+  });
 
   const handleViewFile = (file) => {
     setSelectedFile(file);
@@ -40,13 +37,17 @@ export default function Outboxfunc() {
     setSelectedFile(null);
   };
 
+  const handleForward = (file) => {
+    alert(`Forwarding file: "${file.fileID}"`);
+  };
+
   return (
     <Card
       shadow="sm"
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
@@ -80,11 +81,11 @@ export default function Outboxfunc() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr>
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -129,17 +130,16 @@ export default function Outboxfunc() {
                     <Tooltip label="Forward" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
                           height: "2rem",
                         }}
-                        // eslint-disable-next-line no-return-assign
+                        onClick={() => handleForward(file)}
                         onMouseEnter={(e) =>
                           (e.target.style.backgroundColor = "#ffebee")
                         }
-                        // eslint-disable-next-line no-return-assign
                         onMouseLeave={(e) =>
                           (e.target.style.backgroundColor = "transparent")
                         }
@@ -155,9 +155,7 @@ export default function Outboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td
                     style={{
@@ -205,18 +203,16 @@ export default function Outboxfunc() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",
                         height: "2rem",
                       }}
                       onClick={() => handleViewFile(file)}
-                      // eslint-disable-next-line no-return-assign
                       onMouseEnter={(e) =>
                         (e.target.style.backgroundColor = "#e0e0e0")
                       }
-                      // eslint-disable-next-line no-return-assign
                       onMouseLeave={(e) =>
                         (e.target.style.backgroundColor = "white")
                       }

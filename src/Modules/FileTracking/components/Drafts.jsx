@@ -5,13 +5,13 @@ import {
   Title,
   Table,
   Button,
-  Badge,
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { Archive, Eye } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
-import ViewFiles from "./viewFile";
+import ViewFiles from "./ViewFile";
 
 export default function Draft() {
   const [files, setFiles] = useState([
@@ -31,12 +31,26 @@ export default function Draft() {
 
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const form = useForm({
+    initialValues: {
+      fileType: "",
+      beingsentTo: "",
+      fileID: "",
+      subject: "",
+    },
+    validate: {
+      fileType: (value) => (value ? null : "File type is required"),
+      beingsentTo: (value) => (value ? null : "Recipient is required"),
+      fileID: (value) => (value ? null : "File ID is required"),
+      subject: (value) => (value ? null : "Subject is required"),
+    },
+  });
+
   const handleArchive = (fileID) => {
-    // Update the list by filtering out the archived file
     setFiles((prevFiles) => prevFiles.filter((file) => file.fileID !== fileID));
   };
+
   const handleDeleteFile = (fileID) => {
-    // Update the list by filtering out the deleted file
     setFiles((prevFiles) => prevFiles.filter((file) => file.fileID !== fileID));
     notifications.show({
       title: "File deleted",
@@ -44,12 +58,15 @@ export default function Draft() {
       color: "red",
     });
   };
+
   const handleViewFile = (file) => {
     setSelectedFile(file);
+    form.setValues(file); // Populate form with file data
   };
 
   const handleBack = () => {
     setSelectedFile(null);
+    form.reset(); // Reset form when going back
   };
 
   return (
@@ -58,7 +75,7 @@ export default function Draft() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
@@ -91,11 +108,11 @@ export default function Draft() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -146,18 +163,16 @@ export default function Draft() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         onClick={() => handleArchive(file.fileID)} // Correct usage
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
                           height: "2rem",
                         }}
-                        // eslint-disable-next-line no-return-assign
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.backgroundColor = "#ffebee")
                         }
-                        // eslint-disable-next-line no-return-assign
                         onMouseLeave={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "transparent")
@@ -174,9 +189,7 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td
                     style={{
@@ -220,11 +233,9 @@ export default function Draft() {
                         fontSize: "0.9rem",
                         padding: "0.5rem 1rem",
                       }}
-                      // eslint-disable-next-line no-return-assign
                       onMouseEnter={(e) =>
                         (e.target.style.backgroundColor = "#e3f2fd")
                       }
-                      // eslint-disable-next-line no-return-assign
                       onMouseLeave={(e) =>
                         (e.target.style.backgroundColor = "white")
                       }
@@ -243,18 +254,16 @@ export default function Draft() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",
                         height: "2rem",
                       }}
                       onClick={() => handleViewFile(file)} // Correct usage
-                      // eslint-disable-next-line no-return-assign
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.backgroundColor = "#e0e0e0")
                       }
-                      // eslint-disable-next-line no-return-assign
                       onMouseLeave={(e) =>
                         (e.currentTarget.style.backgroundColor = "white")
                       }

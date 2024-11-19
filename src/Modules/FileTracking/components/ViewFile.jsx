@@ -1,17 +1,68 @@
-import { useState } from "react";
-import { Card, Box, Textarea, Button, TextInput, Title } from "@mantine/core";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Box,
+  Textarea,
+  Button,
+  TextInput,
+  Title,
+  ActionIcon,
+} from "@mantine/core";
 import {
   ArrowLeft,
   PaperPlaneTilt,
   ChatCircleDots,
+  Trash,
 } from "@phosphor-icons/react";
+import { notifications } from "@mantine/notifications";
+import axios from "axios";
 
 // eslint-disable-next-line react/prop-types
-export default function ViewFiles({ onBack }) {
+export default function View({ onBack, onDelete }) {
   const [activeSection, setActiveSection] = useState(null);
+  // eslint-disable-next-line no-undef
+  const file_id = null;
+  useEffect(() => {
+    const getFiles = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/file/${file_id}`,
 
+          {
+            params: {
+              username: "atul",
+              designation: "Professor",
+              src_module: "filetracking",
+            },
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${localStorage.getItem("authToken")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+        // Set the response data to the files state
+        console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+      }
+    };
+
+    // Call the getFiles function to fetch data on component mount
+    getFiles();
+  }, []);
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
+  };
+
+  const handleDelete = () => {
+    notifications.show({
+      title: "File Deleted",
+      message: "The file has been successfully deleted.",
+      color: "red",
+    });
+
+    onDelete();
   };
 
   return (
@@ -27,7 +78,12 @@ export default function ViewFiles({ onBack }) {
       }}
     >
       <Box
-        style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
       >
         <Button
           variant="subtle"
@@ -39,6 +95,16 @@ export default function ViewFiles({ onBack }) {
         <Title order={2} style={{ flexGrow: 1, textAlign: "center" }}>
           Title of file
         </Title>
+        <ActionIcon
+          color="red"
+          variant="light"
+          size="lg"
+          onClick={handleDelete} // Call handleDelete on click
+          title="Delete File"
+          style={{ marginLeft: "auto" }}
+        >
+          <Trash size={24} />
+        </ActionIcon>
       </Box>
 
       <Box
@@ -65,10 +131,10 @@ export default function ViewFiles({ onBack }) {
         }}
       >
         <Button
-          leftIcon={<PaperPlaneTilt size={24} />}
+          leftIcon={<PaperPlaneTilt size={24} color="white" />}
           onClick={() => toggleSection("forward")}
           color="blue"
-          style={{ width: "10%", marginRight: "10px", marginLeft: "15px" }}
+          style={{ width: "10%", marginRight: "10px", marginLeft: "25px" }}
         >
           Forward
         </Button>
@@ -76,7 +142,7 @@ export default function ViewFiles({ onBack }) {
           leftIcon={<ChatCircleDots size={24} />}
           onClick={() => toggleSection("feedback")}
           color="blue"
-          style={{ width: "10%" }}
+          style={{ width: "10%", marginRight: "10px", marginLeft: "70%" }}
         >
           Feedback
         </Button>

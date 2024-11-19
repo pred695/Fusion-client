@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -8,28 +8,51 @@ import {
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
+
 import { useForm } from "@mantine/form";
 import { Archive, Eye } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
 import ViewFiles from "./ViewFile";
+import { Archive, PencilSimple } from "@phosphor-icons/react";
+import { notifications } from "@mantine/notifications";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import EditDraft from "./EditDraft";
+
 
 export default function Draft() {
-  const [files, setFiles] = useState([
-    {
-      fileType: "PDF",
-      beingsentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#596",
-      subject: "Fusion Project Module",
-    },
-    {
-      fileType: "PDF",
-      beingsentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#597",
-      subject: "Another Project Module",
-    },
-  ]);
+  const [files, setFiles] = useState([]);
+  const token = localStorage.getItem("authToken");
+  const role = useSelector((state) => state.user.role);
+  const username = useSelector((state) => state.user.name);
+  let current_module = useSelector((state) => state.module.current_module);
+  current_module = current_module.split(" ").join("").toLowerCase();
+  useEffect(() => {
+    const getFiles = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/draft/`,
 
-  const [selectedFile, setSelectedFile] = useState(null);
+          {
+            params: {
+              username,
+              designation: role,
+              src_module: current_module,
+            },
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+        // Set the response data to the files state
+        setFiles(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+      }
+    };
 
   const form = useForm({
     initialValues: {
@@ -51,6 +74,38 @@ export default function Draft() {
   };
 
   const handleDeleteFile = (fileID) => {
+
+    // Call the getFiles function to fetch data on component mount
+    getFiles();
+  }, []);
+  const [editFile, setEditFile] = useState(null); // File being edited
+
+  const handleArchive = async (fileID) => {
+    // eslint-disable-next-line no-unused-vars
+    const response = await axios.post(
+      "http://localhost:8000/filetracking/api/createarchive/",
+      {
+        file_id: fileID,
+      },
+      {
+        params: {
+          username,
+          designation: role,
+          src_module: current_module,
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    const updatedFiles = files.filter((file) => file.id !== fileID);
+    setFiles(updatedFiles);
+  };
+
+  const handleDeleteFile = async (fileID) => {
+    // const response = await axios.delete
     setFiles((prevFiles) => prevFiles.filter((file) => file.fileID !== fileID));
     notifications.show({
       title: "File deleted",
@@ -58,6 +113,7 @@ export default function Draft() {
       color: "red",
     });
   };
+
 
   const handleViewFile = (file) => {
     setSelectedFile(file);
@@ -67,6 +123,14 @@ export default function Draft() {
   const handleBack = () => {
     setSelectedFile(null);
     form.reset(); // Reset form when going back
+
+  const handleEditFile = (file) => {
+    setEditFile(file); // Set the file to edit mode
+  };
+
+  const handleBack = () => {
+    setEditFile(null); // Exit edit mode and go back
+
   };
 
   return (
@@ -77,18 +141,14 @@ export default function Draft() {
       withBorder
       style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
-      {!selectedFile && (
+      {!editFile && (
         <Title order={2} mb="md">
           Drafts
         </Title>
       )}
-      {selectedFile ? (
-        <div>
-          <Title order={3} mb="md">
-            File Subject: {selectedFile.subject}
-          </Title>
-          <ViewFiles file={selectedFile} onBack={handleBack} />
-        </div>
+
+      {editFile ? (
+        <EditDraft file={editFile} onBack={handleBack} />
       ) : (
         <Box
           style={{
@@ -146,7 +206,7 @@ export default function Draft() {
                     border: "1px solid #ddd",
                   }}
                 >
-                  View File
+                  Edit Draft
                 </th>
               </tr>
             </thead>
@@ -163,8 +223,13 @@ export default function Draft() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
+
                         color="blue"
                         onClick={() => handleArchive(file.fileID)} // Correct usage
+
+                        color="red"
+                        onClick={() => handleArchive(file.id)}
+
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
@@ -189,7 +254,13 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
+
                     {file.fileType}
+
+                    <Badge color="gray" style={{ fontSize: "12px" }}>
+                      File type: {file.fileType}
+                    </Badge>
+
                   </td>
                   <td
                     style={{
@@ -198,7 +269,7 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
-                    {file.beingsentTo}
+                    {file.uploader}
                   </td>
                   <td
                     style={{
@@ -207,7 +278,7 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
-                    {file.fileID}
+                    {file.id}
                   </td>
                   <td
                     style={{
@@ -239,7 +310,7 @@ export default function Draft() {
                       onMouseLeave={(e) =>
                         (e.target.style.backgroundColor = "white")
                       }
-                      onClick={() => handleDeleteFile(file.fileID)}
+                      onClick={() => handleDeleteFile(file.id)}
                     >
                       Delete file
                     </Button>
@@ -260,7 +331,12 @@ export default function Draft() {
                         width: "2rem",
                         height: "2rem",
                       }}
+
                       onClick={() => handleViewFile(file)} // Correct usage
+
+                      onClick={() => handleEditFile(file)} // Switch to edit mode
+                      // eslint-disable-next-line no-return-assign
+
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.backgroundColor = "#e0e0e0")
                       }
@@ -268,7 +344,7 @@ export default function Draft() {
                         (e.currentTarget.style.backgroundColor = "white")
                       }
                     >
-                      <Eye size="1rem" />
+                      <PencilSimple size="1rem" />
                     </ActionIcon>
                   </td>
                 </tr>

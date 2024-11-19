@@ -9,13 +9,19 @@ import {
   Title,
   ActionIcon,
   Text,
-  Select,
+  Select
 } from "@mantine/core";
-import { Upload, FloppyDisk } from "@phosphor-icons/react";
+import { Upload, FloppyDisk, Trash } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
 import { useForm } from "@mantine/form";
 
+import axios from "axios";
+
+
+axios.defaults.withCredentials = true;
+// eslint-disable-next-line no-unused-vars
 export default function Compose() {
+
   const form = useForm({
     initialValues: {
       title: "",
@@ -30,12 +36,57 @@ export default function Compose() {
       file: (value) => (value ? null : "File is required"),
     },
   });
+  const [file, setFile] = React.useState(null);
+  const [designation, setDesignation] = React.useState("");
+  const [receiver_username, setReceiverUsername] = React.useState("");
+  const [receiver_designation, setReceiverDesignation] = React.useState("");
+  const [subject, setSubject] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const handleFileChange = (uploadedFile) => {
+    setFile(uploadedFile);
+  };
+  const removeFile = () => {
+    setFile(null);
+  };
 
   const handleSaveDraft = () => {
     notifications.show({
       title: "Draft Saved",
       message: "File has been saved as draft",
     });
+  };
+  const handleCreateFile = async () => {
+    if (!file) {
+      notifications.show({
+        title: "Error",
+        message: "Please upload a file",
+        color: "red",
+      });
+      // eslint-disable-next-line no-useless-return
+      return;
+    }
+    const formData = new FormData();
+    formData.append("subject", subject);
+    formData.append("description", description);
+    formData.append("designation", designation);
+    formData.append("receiver_username", receiver_username);
+    formData.append("receiver_designation", receiver_designation);
+    formData.append("file", file); // Ensure this is the file object
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/filetracking/api/file/",
+        formData,
+        {
+          headers: {
+            Authorization: `Token ${localStorage.getItem("authToken")}`,
+            "Content-Type": "multipart/form-data", // Set the content type for file upload
+          },
+        },
+      );
+      console.log(response.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSubmit = (values) => {
@@ -97,17 +148,31 @@ export default function Compose() {
           label="Title of File"
           placeholder="Enter file title"
           mb="sm"
+
           {...form.getInputProps("title")}
+
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          required
+
         />
         <Textarea
           label="Description"
           placeholder="Enter description"
           mb="sm"
+
           {...form.getInputProps("description")}
+
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+
         />
         <TextInput
-          label="Create as"
-          placeholder="Enter creation type"
+          label="Designation"
+          placeholder="Sender's Designation"
+          value={designation}
+          onChange={(e) => setDesignation(e.target.value)}
           mb="sm"
           {...form.getInputProps("createAs")}
         />
@@ -123,8 +188,11 @@ export default function Compose() {
           }
           placeholder="Upload file"
           accept="application/pdf,image/jpeg,image/png"
-          icon={<Upload size={14} />}
+          icon={<Upload size={16} />}
+          value={file} // Set the file state as the value
+          onChange={handleFileChange} // Update file state on change
           mb="sm"
+
           {...form.getInputProps("file")}
           error={form.errors.file}
         />
@@ -134,12 +202,33 @@ export default function Compose() {
           mb="sm"
           {...form.getInputProps("remark")}
         />
+
+          withAsterisk
+        />
+        {file && (
+          <Group position="apart" mt="sm">
+            <Text>{file.name}</Text>
+            <Button
+              leftIcon={<Trash size={16} />}
+              color="red"
+              onClick={removeFile}
+              compact
+            >
+              Remove File
+            </Button>
+          </Group>
+        )}
+        <Textarea label="Remark" placeholder="Enter remark" mb="sm" />
+
         <TextInput
           label="Forward To"
           placeholder="Enter forward recipient"
+          value={receiver_username}
+          onChange={(e) => setReceiverUsername(e.target.value)}
           mb="sm"
           {...form.getInputProps("forwardTo")}
         />
+
         <Select
           label="Receiver Designation"
           placeholder="Select designation"
@@ -150,6 +239,20 @@ export default function Compose() {
             { value: "Employee", label: "Employee" },
           ]}
           {...form.getInputProps("receiverDesignation")}
+
+        {/* Receiver Designation as a dropdown */}
+        <Select
+          label="Receiver Designation"
+          placeholder="Select designation"
+          data={[
+            { value: "Professor", label: "Professor" },
+            { value: "Student", label: "Student" },
+            { value: "Employee", label: "Employee" },
+          ]}
+          mb="sm"
+          value={receiver_designation}
+          onChange={(value) => setReceiverDesignation(value)}
+
         />
 
         <Button
@@ -160,6 +263,7 @@ export default function Compose() {
             margin: "0 auto",
             width: "200px",
           }}
+          onClick={handleCreateFile}
         >
           Submit
         </Button>

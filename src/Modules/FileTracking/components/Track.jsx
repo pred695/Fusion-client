@@ -11,6 +11,7 @@ import {
 import { Archive, Eye } from "@phosphor-icons/react";
 import { useForm } from "@mantine/form";
 import ViewFiles from "./ViewFile";
+import ViewFileStatus from "./ViewFileStatus";
 
 export default function Track() {
   const [files, setFiles] = useState([
@@ -19,12 +20,14 @@ export default function Track() {
       sentTo: "Employee-Myself",
       fileID: "CSE-2023-11-#596",
       subject: "Fusion Project Module",
+      progress: 50,
     },
     {
       fileType: "PDF",
       sentTo: "Employee-Myself",
       fileID: "CSE-2023-11-#597",
       subject: "Another Project Module",
+      progress: 75,
     },
   ]);
 
@@ -66,9 +69,10 @@ export default function Track() {
       {selectedFile ? (
         <div>
           <Title order={3} mb="md">
-            File Subject
+            File Status
           </Title>
-          <ViewFiles file={selectedFile} onBack={handleBack} />
+          <ViewFileStatus file={selectedFile} onBack={handleBack} />{" "}
+          {/* Updated component */}
         </div>
       ) : (
         <Box
@@ -127,7 +131,7 @@ export default function Track() {
                     border: "1px solid #ddd",
                   }}
                 >
-                  View File
+                  View File Status
                 </th>
               </tr>
             </thead>

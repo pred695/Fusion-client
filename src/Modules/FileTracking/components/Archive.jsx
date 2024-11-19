@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -7,39 +7,51 @@ import {
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { ArrowArcLeft, Archive, Eye } from "@phosphor-icons/react";
-import ViewFiles from "./viewFile";
+import { ArrowArcLeft, Eye } from "@phosphor-icons/react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import View from "./ViewFile";
 
 export default function ArchiveFiles() {
-  const [files, setFiles] = useState([
-    {
-      fileType: "PDF",
-      sentBy: "22BCSD04-Student",
-      fileID: "CSE-2023-11-#596",
-      subject: "Fusion Project Module",
-      date: "Nov 16, 2023, 11:26 p.m",
-      archived: true,
-    },
-    {
-      fileType: "PDF",
-      sentBy: "22BCS031-Student",
-      fileID: "CSE-2023-11-#597",
-      subject: "LaundriX Project Module",
-      date: "Nov 16, 2023, 11:26 p.m",
-      archived: true,
-    },
-    {
-      fileType: "PDF",
-      sentBy: "22BCS273-Student",
-      fileID: "CSE-2023-11-#597",
-      subject: "LogistiX Project Module",
-      date: "Nov 16, 2023, 11:26 p.m",
-      archived: true,
-    },
-  ]);
+  const [files, setFiles] = useState([]);
+  const token = localStorage.getItem("authToken");
+  const role = useSelector((state) => state.user.role);
+  const username = useSelector((state) => state.user.name);
+  let current_module = useSelector((state) => state.module.current_module);
+  current_module = current_module.split(" ").join("").toLowerCase();
+  useEffect(() => {
+    const getFiles = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/archive/`,
+
+          {
+            params: {
+              username,
+              designation: role,
+              src_module: current_module,
+            },
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+        // Set the response data to the files state
+        setFiles(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+      }
+    };
+
+    // Call the getFiles function to fetch data on component mount
+    getFiles();
+  }, []);
 
   const [selectedFile, setSelectedFile] = useState(null);
+
 
   const handleToggleArchive = (fileID) => {
     notifications.show({
@@ -49,8 +61,30 @@ export default function ArchiveFiles() {
     });
     const updatedFiles = files.map((file) =>
       file.fileID === fileID ? { ...file, archived: !file.archived } : file
+
+  const handleToggleArchive = async (fileID) => {
+    // eslint-disable-next-line no-unused-vars
+    const response = await axios.post(
+      "http://localhost:8000/filetracking/api/unarchive/",
+      {
+        file_id: fileID,
+      },
+      {
+        params: {
+          username,
+          designation: role,
+          src_module: current_module,
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Token ${localStorage.getItem("authToken")}`,
+          "Content-Type": "application/json",
+        },
+      },
+
     );
-    setFiles(updatedFiles);
+    const updatedFiles = files.filter((file) => file.id !== fileID);
+    setFiles(updatedFiles); // Update state with the new file list
   };
 
   const handleViewFile = (file) => {
@@ -62,9 +96,9 @@ export default function ArchiveFiles() {
   };
 
   const tableStyles = {
-    border: "1px solid #ddd",
     padding: "12px",
     textAlign: "center",
+    border: "1px solid #ddd",
   };
 
   return (
@@ -77,7 +111,7 @@ export default function ArchiveFiles() {
     >
       {!selectedFile && (
         <Title order={2} mb="md">
-          Archived files
+          Archived Files
         </Title>
       )}
 
@@ -86,7 +120,7 @@ export default function ArchiveFiles() {
           <Title order={3} mb="md">
             File Subject
           </Title>
-          <ViewFiles file={selectedFile} onBack={handleBack} />
+          <View file={selectedFile} onBack={handleBack} />
         </div>
       ) : (
         <Box
@@ -100,9 +134,14 @@ export default function ArchiveFiles() {
         >
           <Table
             highlightOnHover
-            style={{ width: "100%", tableLayout: "fixed" }}
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
           >
             <thead>
+
               <tr style={{ backgroundColor: "#0000" }}>
                 <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
                 <th style={tableStyles}>Received as</th>
@@ -111,6 +150,16 @@ export default function ArchiveFiles() {
                 <th style={tableStyles}>Subject</th>
                 <th style={tableStyles}>Date</th>
                 <th style={{ ...tableStyles, width: "8.5%" }}>View File</th>
+
+              <tr style={{ backgroundColor: "#F0F0F0" }}>
+                <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
+                <th style={{ ...tableStyles, width: "12%" }}>Received As</th>
+                <th style={{ ...tableStyles, width: "18%" }}>Sent By</th>
+                <th style={{ ...tableStyles, width: "15%" }}>File ID</th>
+                <th style={{ ...tableStyles, width: "25%" }}>Subject</th>
+                <th style={{ ...tableStyles, width: "15%" }}>Date</th>
+                <th style={{ ...tableStyles, width: "7%" }}>View File</th>
+
               </tr>
             </thead>
             <tbody>
@@ -124,15 +173,16 @@ export default function ArchiveFiles() {
                     >
                       <ActionIcon
                         variant="light"
+
                         color={file.archived ? "red" : "blue"}
                         onClick={() => handleToggleArchive(file.fileID)}
+
+                        color="red"
+                        onClick={() => handleToggleArchive(file.id)}
+
                         style={{ width: "2rem", height: "2rem" }}
                       >
-                        {file.archived ? (
-                          <ArrowArcLeft size="1rem" />
-                        ) : (
-                          <Archive size="1rem" />
-                        )}
+                        <ArrowArcLeft size="1rem" />
                       </ActionIcon>
                     </Tooltip>
                   </td>
@@ -145,10 +195,10 @@ export default function ArchiveFiles() {
                   >
                     {file.fileType}
                   </td>
-                  <td style={tableStyles}>{file.sentBy}</td>
-                  <td style={tableStyles}>{file.fileID}</td>
+                  <td style={tableStyles}>{file.uploader}</td>
+                  <td style={tableStyles}>{file.id}</td>
                   <td style={tableStyles}>{file.subject}</td>
-                  <td style={tableStyles}>{file.date}</td>
+                  <td style={tableStyles}>{file.upload_date}</td>
                   <td style={tableStyles}>
                     <ActionIcon
                       variant="outline"

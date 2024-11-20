@@ -62,7 +62,6 @@ export default function Compose() {
         {
           headers: {
             Authorization: `Token ${localStorage.getItem("authToken")}`,
-            "Content-Type": "multipart/form-data", // Set the content type for file upload
           },
         },
       );

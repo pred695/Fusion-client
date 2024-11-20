@@ -22,6 +22,7 @@ export default function Draft() {
   const username = useSelector((state) => state.user.name);
   let current_module = useSelector((state) => state.module.current_module);
   current_module = current_module.split(" ").join("").toLowerCase();
+
   useEffect(() => {
     const getFiles = async () => {
       try {

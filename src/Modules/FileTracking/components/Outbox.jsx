@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Box, Card, Title, Table, Tooltip, ActionIcon } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import {
   Box,
   Card,
@@ -35,7 +33,6 @@ export default function Outboxfunc() {
     },
   ]);
 
-  const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null); // For viewing file details
   const [forwardFile, setForwardFile] = useState(null); // For forwarding file
   const [recipientDesignation, setRecipientDesignation] = useState(""); // State for recipient's designation
@@ -65,11 +62,6 @@ export default function Outboxfunc() {
     ],
   };
 
-  // Mantine form for forward (if needed for future enhancements)
-  const form = useForm({
-    initialValues: {},
-  });
-
   const handleViewFile = (file) => {
     setSelectedFile(file);
   };
@@ -96,17 +88,13 @@ export default function Outboxfunc() {
     setRemarks("");
   };
 
-  const handleForward = (file) => {
-    alert(`Forwarding file: "${file.fileID}"`);
-  };
-
   return (
     <Card
       shadow="sm"
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
     >
       {!selectedFile && !forwardFile && (
         <Title order={2} mb="md">
@@ -201,11 +189,11 @@ export default function Outboxfunc() {
             }}
           >
             <thead>
-              <tr>
+              <tr style={{ backgroundColor: "#F0F0F0" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "8%",
+                    width: "6%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -250,19 +238,12 @@ export default function Outboxfunc() {
                     <Tooltip label="Forward" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="blue"
+                        color="red"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
                           height: "2rem",
                         }}
-                        onClick={() => handleForward(file)}
-                        onMouseEnter={(e) =>
-                          (e.target.style.backgroundColor = "#ffebee")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.target.style.backgroundColor = "transparent")
-                        }
                         onClick={() => handleForwardFile(file)} // Set the file to forward
                         onMouseEnter={(e) => {
                           e.target.style.backgroundColor = "#ffebee";
@@ -282,7 +263,9 @@ export default function Outboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    {file.fileType}
+                    <Badge color="gray" style={{ fontSize: "12px" }}>
+                      File type: {file.fileType}
+                    </Badge>
                   </td>
                   <td
                     style={{
@@ -327,24 +310,6 @@ export default function Outboxfunc() {
                       border: "1px solid #ddd",
                     }}
                   >
-                    <ActionIcon
-                      variant="outline"
-                      color="black"
-                      style={{
-                        transition: "background-color 0.3s",
-                        width: "2rem",
-                        height: "2rem",
-                      }}
-                      onClick={() => handleViewFile(file)}
-                      onMouseEnter={(e) =>
-                        (e.target.style.backgroundColor = "#e0e0e0")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.target.style.backgroundColor = "white")
-                      }
-                    >
-                      <Eye size="1rem" />
-                    </ActionIcon>
                     <Tooltip label="View File" position="top" withArrow>
                       <ActionIcon
                         variant="light"

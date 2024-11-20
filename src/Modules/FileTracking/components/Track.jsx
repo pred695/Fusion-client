@@ -5,12 +5,11 @@ import {
   Title,
   Table,
   Button,
+  Badge,
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
 import { Archive, Eye } from "@phosphor-icons/react";
-import { useForm } from "@mantine/form";
-import ViewFiles from "./ViewFile";
 import ViewFileStatus from "./ViewFileStatus";
 
 export default function Track() {
@@ -33,12 +32,6 @@ export default function Track() {
 
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const form = useForm({
-    initialValues: {
-      dummyField: "", // Placeholder for potential form data
-    },
-  });
-
   const handleArchive = (fileID) => {
     const updatedFiles = files.filter((file) => file.fileID !== fileID);
     setFiles(updatedFiles);
@@ -58,7 +51,7 @@ export default function Track() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
@@ -93,11 +86,11 @@ export default function Track() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#0000" }}>
+              <tr style={{ backgroundColor: "#F0F0F0" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "8%",
+                    width: "6%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -148,7 +141,7 @@ export default function Track() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="blue"
+                        color="red"
                         onClick={() => handleArchive(file.fileID)}
                         style={{
                           transition: "background-color 0.3s",
@@ -173,7 +166,9 @@ export default function Track() {
                       textAlign: "center",
                     }}
                   >
-                    {file.fileType}
+                    <Badge color="gray" style={{ fontSize: "12px" }}>
+                      File type: {file.fileType}
+                    </Badge>
                   </td>
                   <td
                     style={{
@@ -237,13 +232,13 @@ export default function Track() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="black"
+                      color="gray"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",
                         height: "2rem",
                       }}
-                      onClick={() => handleViewFile(file)}
+                      onClick={() => handleViewFile(file)} // View file on click
                       onMouseEnter={(e) => {
                         e.target.style.backgroundColor = "#e0e0e0";
                       }}

@@ -109,7 +109,13 @@ export default function Inboxfunc() {
           <Title order={3} mb="md">
             File Subject
           </Title>
-          <View onBack={handleBack} fileID={selectedFile.id} />
+          <View
+            onBack={handleBack}
+            fileID={selectedFile.id}
+            updateFiles={() =>
+              setFiles(files.filter((f) => f.id !== selectedFile.id))
+            }
+          />
         </div>
       ) : (
         <Box

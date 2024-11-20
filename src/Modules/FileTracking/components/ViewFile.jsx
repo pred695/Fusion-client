@@ -17,16 +17,12 @@ import {
   ChatCircleDots,
   Trash,
 } from "@phosphor-icons/react";
-import { useSelector } from "react-redux";
+import { notifications } from "@mantine/notifications";
 import axios from "axios";
 
-export default function View({ onBack, fileID }) {
+export default function View({ onBack, fileID, updateFiles }) {
   const [activeSection, setActiveSection] = useState(null);
   const [file, setFile] = useState({});
-  const role = useSelector((state) => state.user.role);
-  const username = useSelector((state) => state.user.name);
-  let current_module = useSelector((state) => state.module.current_module);
-  current_module = current_module.split(" ").join("").toLowerCase();
   const token = localStorage.getItem("authToken");
 
   const convertDate = (date) => {
@@ -40,11 +36,6 @@ export default function View({ onBack, fileID }) {
         const response = await axios.get(
           `http://localhost:8000/filetracking/api/file/${fileID}`,
           {
-            params: {
-              username,
-              designation: role,
-              src_module: current_module,
-            },
             withCredentials: true,
             headers: {
               Authorization: `Token ${token}`,
@@ -63,8 +54,33 @@ export default function View({ onBack, fileID }) {
     setActiveSection(activeSection === section ? null : section);
   };
 
-  const handleDelete = () => {
-    console.log("Delete file");
+  const handleDelete = async () => {
+    const response = await axios.delete(
+      `http://localhost:8000/filetracking/api/file/${fileID}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    );
+    if (response.status === 204) {
+      updateFiles();
+      onBack();
+      notifications.show({
+        title: "File deleted successfully",
+        message: "The file has been deleted successfully.",
+        color: "green",
+        position: "top-center",
+      });
+    } else {
+      notifications.show({
+        title: "Failed to delete file",
+        message: "Some error occured. Please try again later.",
+        color: "red",
+        position: "top-center",
+      });
+    }
   };
 
   return (
@@ -89,7 +105,7 @@ export default function View({ onBack, fileID }) {
           color="red"
           variant="light"
           size="lg"
-          onClick={handleDelete}
+          onClick={() => handleDelete()}
         >
           <Trash size={24} />
         </ActionIcon>
@@ -230,4 +246,5 @@ export default function View({ onBack, fileID }) {
 View.propTypes = {
   onBack: PropTypes.func.isRequired,
   fileID: PropTypes.number.isRequired,
+  updateFiles: PropTypes.func.isRequired,
 };

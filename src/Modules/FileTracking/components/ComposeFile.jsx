@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { Upload, FloppyDisk, Trash } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
+import { useSelector } from "react-redux";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
@@ -23,19 +24,46 @@ export default function Compose() {
   const [designation, setDesignation] = React.useState("");
   const [receiver_username, setReceiverUsername] = React.useState("");
   const [receiver_designation, setReceiverDesignation] = React.useState("");
+  const [receiver_designations, setReceiverDesignations] = React.useState("");
   const [subject, setSubject] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const token = localStorage.getItem("authToken");
+  const roles = useSelector((state) => state.user.roles);
+  const options = roles.map((role) => ({ value: role, label: role }));
+  const receiverRoles = Array.isArray(receiver_designations)
+    ? receiver_designations.map((role) => ({
+        value: role,
+        label: role,
+      }))
+    : [];
+
   const handleFileChange = (uploadedFile) => {
     setFile(uploadedFile);
   };
   const removeFile = () => {
     setFile(null);
   };
-
+  useEffect(() => {
+    setDesignation(roles);
+    console.log(receiverRoles);
+  }, [roles, receiverRoles]);
+  const fetchRoles = async () => {
+    const response = await axios.get(
+      `http://localhost:8000/filetracking/api/designations/${receiver_username}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    );
+    setReceiverDesignations(response.data.designations);
+  };
   const handleSaveDraft = () => {
     notifications.show({
       title: "Draft Saved",
       message: "File has been saved as draft",
+      color: "blue",
+      position: "top-center",
     });
   };
   const handleCreateFile = async () => {
@@ -44,6 +72,7 @@ export default function Compose() {
         title: "Error",
         message: "Please upload a file",
         color: "red",
+        position: "top-center",
       });
       // eslint-disable-next-line no-useless-return
       return;
@@ -61,7 +90,7 @@ export default function Compose() {
         formData,
         {
           headers: {
-            Authorization: `Token ${localStorage.getItem("authToken")}`,
+            Authorization: `Token ${token}`,
           },
         },
       );
@@ -94,7 +123,7 @@ export default function Compose() {
           size="lg"
           variant="outline"
           color="blue"
-          onClick={handleSaveDraft}
+          onClick={() => handleSaveDraft()}
           title="Save as Draft"
         >
           <FloppyDisk size={20} />
@@ -131,12 +160,13 @@ export default function Compose() {
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-        <TextInput
+        <Select
           label="Designation"
           placeholder="Sender's Designation"
           value={designation}
-          onChange={(e) => setDesignation(e.target.value)}
+          data={options}
           mb="sm"
+          onChange={(value) => setDesignation(value)}
         />
         <FileInput
           label="Attach file (PDF, JPG, PNG) (MAX: 10MB)"
@@ -173,13 +203,10 @@ export default function Compose() {
         <Select
           label="Receiver Designation"
           placeholder="Select designation"
-          data={[
-            { value: "Professor", label: "Professor" },
-            { value: "Student", label: "Student" },
-            { value: "Employee", label: "Employee" },
-          ]}
-          mb="sm"
+          onClick={() => fetchRoles()}
           value={receiver_designation}
+          data={receiverRoles}
+          mb="sm"
           onChange={(value) => setReceiverDesignation(value)}
         />
 

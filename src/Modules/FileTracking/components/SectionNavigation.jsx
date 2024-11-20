@@ -10,6 +10,7 @@ import Track from "./Track";
 import Draft from "./Drafts";
 import ArchiveFiles from "./Archive";
 import { setActiveTab_ } from "../../../redux/moduleslice";
+import classes from "../../Dashboard/Dashboard.module.css";
 
 const sections = [
   "Compose File",
@@ -89,13 +90,18 @@ export default function SectionNavigation() {
           <Text
             key={section}
             size="sm"
+            className={classes.fusionText}
             style={{
               cursor: "pointer",
               padding: "8px 16px",
               whiteSpace: "nowrap",
               margin: "0",
-              color: activeSection === section ? "#007ACC" : "#000000",
-              fontWeight: activeSection === section ? "600" : "normal",
+              background:
+                activeSection === section
+                  ? "rgba(150, 200, 255, 0.3)"
+                  : "transparent",
+              color: activeSection === section ? "#15ABFF" : "#000000",
+              // fontWeight: activeSection === section ? "600" : "normal",
               borderBottom:
                 activeSection === section
                   ? "2.5px solid #007ACC"

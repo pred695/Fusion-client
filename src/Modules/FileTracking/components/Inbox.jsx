@@ -20,6 +20,10 @@ export default function Inboxfunc() {
   const username = useSelector((state) => state.user.name);
   let current_module = useSelector((state) => state.module.current_module);
   current_module = current_module.split(" ").join("").toLowerCase();
+  const convertDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleString();
+  };
   useEffect(() => {
     const getFiles = async () => {
       try {
@@ -35,7 +39,6 @@ export default function Inboxfunc() {
             withCredentials: true,
             headers: {
               Authorization: `Token ${token}`,
-              "Content-Type": "multipart/form-data",
             },
           },
         );
@@ -62,23 +65,18 @@ export default function Inboxfunc() {
       },
       {
         params: {
-          username: "atul",
-          designation: "Professor",
-          src_module: "filetracking",
+          username,
+          designation: role,
+          src_module: current_module,
         },
         withCredentials: true,
         headers: {
-          Authorization: `Token ${localStorage.getItem("authToken")}`,
-          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
         },
       },
     );
     const updatedFiles = files.filter((file) => file.id !== fileID);
     setFiles(updatedFiles);
-  };
-
-  const handleViewFile = (file) => {
-    setSelectedFile(file);
   };
 
   const handleBack = () => {
@@ -111,7 +109,7 @@ export default function Inboxfunc() {
           <Title order={3} mb="md">
             File Subject
           </Title>
-          <View file={selectedFile} onBack={handleBack} />
+          <View onBack={handleBack} fileID={selectedFile.id} />
         </div>
       ) : (
         <Box
@@ -244,7 +242,7 @@ export default function Inboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    {file.upload_date}
+                    {convertDate(file.upload_date)}
                   </td>
 
                   <td
@@ -267,7 +265,7 @@ export default function Inboxfunc() {
                       data-hover-color="#e0e0e0" // Store hover color
                       onMouseEnter={handleMouseEnter} // Handle mouse enter
                       onMouseLeave={handleMouseLeave} // Handle mouse leave
-                      onClick={() => handleViewFile(file.id)}
+                      onClick={() => setSelectedFile(file)}
                     >
                       <Eye size="1rem" />
                     </ActionIcon>

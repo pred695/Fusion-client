@@ -1,3 +1,9 @@
+import React, { useState } from "react";
+import { Box, Card, Title, Table, ActionIcon, Tooltip } from "@mantine/core";
+import { Archive, Eye } from "@phosphor-icons/react";
+import { useForm } from "@mantine/form";
+import ViewFiles from "./ViewFile";
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -12,6 +18,7 @@ import { Archive, Eye } from "@phosphor-icons/react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import View from "./ViewFile";
+
 
 export default function Inboxfunc() {
   const [files, setFiles] = useState([]);
@@ -53,6 +60,15 @@ export default function Inboxfunc() {
 
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const form = useForm({
+    initialValues: {
+      // Placeholder for future form values if needed
+    },
+  });
+
+  const handleArchive = (fileID) => {
+    const updatedFiles = files.filter((file) => file.fileID !== fileID);
+
   const handleArchive = async (fileID) => {
     // eslint-disable-next-line no-unused-vars
     const response = await axios.post(
@@ -74,6 +90,7 @@ export default function Inboxfunc() {
       },
     );
     const updatedFiles = files.filter((file) => file.id !== fileID);
+
     setFiles(updatedFiles);
   };
 
@@ -85,27 +102,20 @@ export default function Inboxfunc() {
     setSelectedFile(null);
   };
 
-  const handleMouseEnter = (e) => {
-    e.target.style.backgroundColor = e.target.dataset.hoverColor; // Set hover color
-  };
-
-  const handleMouseLeave = (e) => {
-    e.target.style.backgroundColor = e.target.dataset.defaultColor; // Reset to default
-  };
-
   return (
     <Card
       shadow="sm"
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
           Inbox
         </Title>
       )}
+
       {selectedFile ? (
         <div>
           <Title order={3} mb="md">
@@ -132,11 +142,11 @@ export default function Inboxfunc() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -181,16 +191,16 @@ export default function Inboxfunc() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
+
+                        color="blue"
+                        onClick={() => handleArchive(file.fileID)}
+
                         color="red"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
                           height: "2rem",
                         }}
-                        data-default-color="transparent" // Store default color
-                        data-hover-color="#ffebee" // Store hover color
-                        onMouseEnter={handleMouseEnter} // Handle mouse enter
-                        onMouseLeave={handleMouseLeave} // Handle mouse leave
                       >
                         <Archive
                           size="1rem"
@@ -206,6 +216,8 @@ export default function Inboxfunc() {
                       textAlign: "center",
                     }}
                   >
+                    {file.fileType}
+
                     <Badge color="gray" style={{ fontSize: "12px" }}>
                       File type: {file.name}
                     </Badge>
@@ -246,7 +258,6 @@ export default function Inboxfunc() {
                   >
                     {file.upload_date}
                   </td>
-
                   <td
                     style={{
                       padding: "12px",
@@ -257,12 +268,14 @@ export default function Inboxfunc() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",
                         height: "2rem",
                       }}
+                      onClick={() => handleViewFile(file)}
+
                       data-default-color="white" // Store default color
                       data-hover-color="#e0e0e0" // Store hover color
                       onMouseEnter={handleMouseEnter} // Handle mouse enter

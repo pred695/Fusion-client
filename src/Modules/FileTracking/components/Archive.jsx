@@ -6,7 +6,6 @@ import {
   Table,
   ActionIcon,
   Tooltip,
-  Badge,
 } from "@mantine/core";
 import { ArrowArcLeft, Eye } from "@phosphor-icons/react";
 import axios from "axios";
@@ -53,6 +52,16 @@ export default function ArchiveFiles() {
 
   const [selectedFile, setSelectedFile] = useState(null);
 
+
+  const handleToggleArchive = (fileID) => {
+    notifications.show({
+      title: "File archived",
+      message: "The file has been successfully archived",
+      color: "blue",
+    });
+    const updatedFiles = files.map((file) =>
+      file.fileID === fileID ? { ...file, archived: !file.archived } : file
+
   const handleToggleArchive = async (fileID) => {
     // eslint-disable-next-line no-unused-vars
     const response = await axios.post(
@@ -72,6 +81,7 @@ export default function ArchiveFiles() {
           "Content-Type": "application/json",
         },
       },
+
     );
     const updatedFiles = files.filter((file) => file.id !== fileID);
     setFiles(updatedFiles); // Update state with the new file list
@@ -97,7 +107,7 @@ export default function ArchiveFiles() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
         <Title order={2} mb="md">
@@ -131,6 +141,16 @@ export default function ArchiveFiles() {
             }}
           >
             <thead>
+
+              <tr style={{ backgroundColor: "#0000" }}>
+                <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
+                <th style={tableStyles}>Received as</th>
+                <th style={tableStyles}>Sent by</th>
+                <th style={tableStyles}>File ID</th>
+                <th style={tableStyles}>Subject</th>
+                <th style={tableStyles}>Date</th>
+                <th style={{ ...tableStyles, width: "8.5%" }}>View File</th>
+
               <tr style={{ backgroundColor: "#F0F0F0" }}>
                 <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
                 <th style={{ ...tableStyles, width: "12%" }}>Received As</th>
@@ -139,6 +159,7 @@ export default function ArchiveFiles() {
                 <th style={{ ...tableStyles, width: "25%" }}>Subject</th>
                 <th style={{ ...tableStyles, width: "15%" }}>Date</th>
                 <th style={{ ...tableStyles, width: "7%" }}>View File</th>
+
               </tr>
             </thead>
             <tbody>
@@ -152,8 +173,13 @@ export default function ArchiveFiles() {
                     >
                       <ActionIcon
                         variant="light"
+
+                        color={file.archived ? "red" : "blue"}
+                        onClick={() => handleToggleArchive(file.fileID)}
+
                         color="red"
                         onClick={() => handleToggleArchive(file.id)}
+
                         style={{ width: "2rem", height: "2rem" }}
                       >
                         <ArrowArcLeft size="1rem" />
@@ -167,9 +193,7 @@ export default function ArchiveFiles() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td style={tableStyles}>{file.uploader}</td>
                   <td style={tableStyles}>{file.id}</td>
@@ -178,7 +202,7 @@ export default function ArchiveFiles() {
                   <td style={tableStyles}>
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       onClick={() => handleViewFile(file)}
                       style={{ width: "2rem", height: "2rem" }}
                     >

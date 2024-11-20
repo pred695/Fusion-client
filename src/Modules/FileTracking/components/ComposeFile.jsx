@@ -9,16 +9,33 @@ import {
   Title,
   ActionIcon,
   Text,
-  Select,
-  Group,
+  Select
 } from "@mantine/core";
 import { Upload, FloppyDisk, Trash } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
+import { useForm } from "@mantine/form";
+
 import axios from "axios";
+
 
 axios.defaults.withCredentials = true;
 // eslint-disable-next-line no-unused-vars
 export default function Compose() {
+
+  const form = useForm({
+    initialValues: {
+      title: "",
+      description: "",
+      createAs: "",
+      file: null,
+      remark: "",
+      forwardTo: "",
+      receiverDesignation: "",
+    },
+    validate: {
+      file: (value) => (value ? null : "File is required"),
+    },
+  });
   const [file, setFile] = React.useState(null);
   const [designation, setDesignation] = React.useState("");
   const [receiver_username, setReceiverUsername] = React.useState("");
@@ -72,13 +89,24 @@ export default function Compose() {
     }
   };
 
+  const handleSubmit = (values) => {
+    notifications.show({
+      title: "File Submitted",
+      message: `File with title "${values.title}" has been successfully submitted.`,
+    });
+  };
+
   return (
     <Card
       shadow="sm"
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", position: "relative" }}
+      style={{
+        backgroundColor: "#F5F7F8",
+        position: "relative",
+        margin: "32px",
+      }}
     >
       {/* Icon at Top Right with Text Beneath */}
       <Box
@@ -110,7 +138,7 @@ export default function Compose() {
       </Title>
       <Box
         component="form"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={form.onSubmit(handleSubmit)}
         style={{
           backgroundColor: "#F5F7F8",
           padding: "16px",
@@ -120,17 +148,25 @@ export default function Compose() {
           label="Title of File"
           placeholder="Enter file title"
           mb="sm"
+
+          {...form.getInputProps("title")}
+
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           required
+
         />
         <Textarea
           label="Description"
           placeholder="Enter description"
           mb="sm"
+
+          {...form.getInputProps("description")}
+
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+
         />
         <TextInput
           label="Designation"
@@ -138,15 +174,35 @@ export default function Compose() {
           value={designation}
           onChange={(e) => setDesignation(e.target.value)}
           mb="sm"
+          {...form.getInputProps("createAs")}
         />
         <FileInput
-          label="Attach file (PDF, JPG, PNG) (MAX: 10MB)"
+          label={
+            <span>
+              Attach file (PDF, JPG, PNG) (MAX: 10MB)
+              <Text color="red" component="span">
+                {" "}
+                *
+              </Text>
+            </span>
+          }
           placeholder="Upload file"
           accept="application/pdf,image/jpeg,image/png"
           icon={<Upload size={16} />}
           value={file} // Set the file state as the value
           onChange={handleFileChange} // Update file state on change
           mb="sm"
+
+          {...form.getInputProps("file")}
+          error={form.errors.file}
+        />
+        <Textarea
+          label="Remark"
+          placeholder="Enter remark"
+          mb="sm"
+          {...form.getInputProps("remark")}
+        />
+
           withAsterisk
         />
         {file && (
@@ -163,13 +219,27 @@ export default function Compose() {
           </Group>
         )}
         <Textarea label="Remark" placeholder="Enter remark" mb="sm" />
+
         <TextInput
           label="Forward To"
           placeholder="Enter forward recipient"
           value={receiver_username}
           onChange={(e) => setReceiverUsername(e.target.value)}
           mb="sm"
+          {...form.getInputProps("forwardTo")}
         />
+
+        <Select
+          label="Receiver Designation"
+          placeholder="Select designation"
+          mb="sm"
+          data={[
+            { value: "Professor", label: "Professor" },
+            { value: "Student", label: "Student" },
+            { value: "Employee", label: "Employee" },
+          ]}
+          {...form.getInputProps("receiverDesignation")}
+
         {/* Receiver Designation as a dropdown */}
         <Select
           label="Receiver Designation"
@@ -182,6 +252,7 @@ export default function Compose() {
           mb="sm"
           value={receiver_designation}
           onChange={(value) => setReceiverDesignation(value)}
+
         />
 
         <Button

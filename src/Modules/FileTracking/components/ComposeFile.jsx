@@ -106,13 +106,19 @@ export default function Compose() {
     }
 
     try {
+      const fileAttachment =
+        file.upload_file instanceof File
+          ? file.upload_file
+          : new File([file.upload_file], "uploaded_file", {
+              type: "application/octet-stream",
+            });
       const formData = new FormData();
       formData.append("subject", subject);
       formData.append("description", description);
       formData.append("designation", designation);
       formData.append("receiver_username", receiver_username);
       formData.append("receiver_designation", receiver_designation);
-      formData.append("file", file); // Ensure this is the file object
+      formData.append("file", fileAttachment); // Ensure this is the file object
       formData.append("src_module", module);
       const response = await axios.post(
         "http://localhost:8000/filetracking/api/file/",

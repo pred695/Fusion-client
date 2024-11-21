@@ -88,7 +88,6 @@ export default function Inboxfunc() {
       shadow="sm"
       padding="lg"
       radius="md"
-      withBorder
       style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
@@ -145,7 +144,7 @@ export default function Inboxfunc() {
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >

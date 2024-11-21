@@ -145,18 +145,21 @@ export default function Outboxfunc() {
       shadow="sm"
       padding="lg"
       radius="md"
-      withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
     >
       {!selectedFile && !forwardFile && (
-        <Title order={2} mb="md">
+        <Title order={2} mb="md" style={{
+          fontSize: "24px",
+        }}>
           Outbox
         </Title>
       )}
 
       {selectedFile ? (
         <div>
-          <Title order={3} mb="md">
+          <Title order={3} mb="md" style={{
+          fontSize: "26px",
+        }}>
             File Subject
           </Title>
           <View
@@ -243,14 +246,15 @@ export default function Outboxfunc() {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              fontSize: "14px",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -292,7 +296,7 @@ export default function Outboxfunc() {
                     <Tooltip label="Forward" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
@@ -317,9 +321,7 @@ export default function Outboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td
                     style={{
@@ -358,7 +360,7 @@ export default function Outboxfunc() {
                     <Tooltip label="View File" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="blue"
+                        color="black"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",

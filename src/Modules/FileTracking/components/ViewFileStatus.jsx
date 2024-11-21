@@ -1,34 +1,46 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import { Card, Box, Progress, Button, ActionIcon, Title } from "@mantine/core";
-import { Trash, Pause, X, Play, ArrowLeft } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import {
+  Card,
+  Box,
+  Button,
+  ActionIcon,
+  Title,
+  Table,
+  Text,
+} from "@mantine/core";
+import { Trash, ArrowLeft } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications"; // Import for notifications
+import PropTypes from "prop-types";
+import axios from "axios";
 
-export default function FileStatusPage({ onBack, onDelete }) {
-  const [loading, setLoading] = useState(true); // Simulate loading state
-  const [progress] = useState(65); // Example progress percentage
-  const [isPaused, setIsPaused] = useState(false);
+export default function FileStatusPage({ onBack, fileID, updateFiles }) {
+  const [fileHistory, setFileHistory] = useState(null); // To store API response data
 
-  // Function to pause/resume the loading
-  const handlePauseResume = () => {
-    setIsPaused(!isPaused);
-    notifications.show({
-      title: isPaused ? "Resumed" : "Paused",
-      message: isPaused
-        ? "The loading has resumed."
-        : "The loading has been paused.",
-      color: isPaused ? "green" : "yellow",
-    });
-  };
+  useEffect(() => {
+    const getHistory = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/history/${fileID}`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${localStorage.getItem("authToken")}`,
+            },
+          },
+        );
+        setFileHistory(response.data[0]); // Set the response data
+      } catch (err) {
+        console.error("Error fetching history:", err);
+      }
+    };
 
-  // Function to cancel the loading
-  const handleCancel = () => {
-    setLoading(false);
-    notifications.show({
-      title: "Loading Cancelled",
-      message: "The loading process has been cancelled.",
-      color: "red",
-    });
+    getHistory(); // Ensure the function is invoked once
+  }, [fileID]);
+
+  const convertDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleString();
   };
 
   // Function to delete the file
@@ -38,7 +50,8 @@ export default function FileStatusPage({ onBack, onDelete }) {
       message: "The file has been successfully deleted.",
       color: "red",
     });
-    onDelete();
+    updateFiles();
+    onBack();
   };
 
   return (
@@ -50,82 +63,106 @@ export default function FileStatusPage({ onBack, onDelete }) {
       style={{
         backgroundColor: "#F5F7F8",
         minHeight: "100vh",
-        padding: "2rem",
       }}
     >
       {/* Header with Back and Delete buttons */}
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        <Button
-          variant="subtle"
-          onClick={onBack}
-          style={{ marginRight: "1rem" }}
-        >
-          <ArrowLeft size={24} />
-        </Button>
-        <Title order={2} style={{ flexGrow: 1, textAlign: "center" }}>
-          File Loading Status
-        </Title>
-        <ActionIcon
-          color="red"
-          variant="light"
-          size="lg"
-          onClick={handleDelete} // Call handleDelete on click
-          title="Delete File"
-        >
-          <Trash size={24} />
-        </ActionIcon>
-      </Box>
-
-      {/* Loading Bar */}
-      {loading ? (
+      <Card.Section>
         <Box
           style={{
-            backgroundColor: "#F5F7F8",
-            padding: "16px",
-            marginBottom: "2rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1.5rem",
+            padding: "1rem",
           }}
         >
-          <Progress
-            value={progress}
-            label={`${progress}%`}
-            size="xl"
-            striped
-            animate={!isPaused} // Animate only if not paused
-            style={{ marginBottom: "2rem" }}
-          />
+          <Button
+            variant="subtle"
+            onClick={onBack}
+            size="md"
+            style={{ marginRight: "1rem" }}
+          >
+            <ArrowLeft size={24} />
+          </Button>
+          <Title order={2} style={{ flexGrow: 1, textAlign: "center" }}>
+            File Loading Status
+          </Title>
+          <ActionIcon
+            color="red"
+            variant="light"
+            size="lg"
+            onClick={handleDelete} // Call handleDelete on click
+            title="Delete File"
+          >
+            <Trash size={24} />
+          </ActionIcon>
+        </Box>
+      </Card.Section>
 
-          {/* Pause, Cancel, and Resume Buttons */}
-          <Box style={{ display: "flex", justifyContent: "space-between" }}>
-            <Button
-              leftIcon={isPaused ? <Play size={24} /> : <Pause size={24} />}
-              color="yellow"
-              onClick={handlePauseResume}
-              style={{ width: "10%", marginRight: "10px", marginLeft: "25px" }}
+      {/* Display File History */}
+      <Card.Section>
+        {fileHistory ? (
+          <Box
+            style={{
+              padding: "1rem",
+              backgroundColor: "#ffffff",
+              borderRadius: "8px",
+              marginBottom: "1rem",
+            }}
+          >
+            <Text size="md" weight={500} style={{ marginBottom: "1rem" }}>
+              File Details
+            </Text>
+            <Table
+              withBorder
+              highlightOnHover
+              style={{
+                borderRadius: "8px",
+              }}
             >
-              {isPaused ? "Resume" : "Pause"}
-            </Button>
-            <Button
-              leftIcon={<X size={24} />}
-              color="red"
-              onClick={handleCancel}
-              style={{ width: "10%", marginRight: "10px", marginLeft: "70%" }}
-            >
-              Cancel
-            </Button>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Receiver</th>
+                  <th>Current Holder</th>
+                  <th>Designation</th>
+                  <th>Remarks</th>
+                  <th>Received At</th>
+                  <th>Forwarded At</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{fileHistory.id}</td>
+                  <td>{fileHistory.receiver_id}</td>
+                  <td>{fileHistory.current_id}</td>
+                  <td>{fileHistory.receive_design}</td>
+                  <td>{fileHistory.remarks}</td>
+                  <td>{convertDate(fileHistory.receive_date)}</td>
+                  <td>{convertDate(fileHistory.forward_date)}</td>
+                  <td>{fileHistory.is_read ? "Processed" : "Not Processed"}</td>
+                </tr>
+              </tbody>
+            </Table>
           </Box>
-        </Box>
-      ) : (
-        <Box style={{ textAlign: "center", marginTop: "2rem" }}>
-          <Title order={3}>Loading Cancelled</Title>
-        </Box>
-      )}
+        ) : (
+          <Text
+            size="md"
+            color="dimmed"
+            align="center"
+            style={{ padding: "1rem" }}
+          >
+            Loading file history...
+          </Text>
+        )}
+      </Card.Section>
     </Card>
   );
 }
+
+PropTypes.FileStatusPage = {
+  onBack: PropTypes.func.isRequired,
+  fileID: PropTypes.string.isRequired,
+  updateFiles: PropTypes.func.isRequired,
+};

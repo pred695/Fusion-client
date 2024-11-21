@@ -5,7 +5,6 @@ import {
   Title,
   Table,
   Button,
-  Badge,
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
@@ -102,12 +101,16 @@ export default function Draft() {
       shadow="sm"
       padding="lg"
       radius="md"
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!editFile && (
-        <Title order={2} mb="md" style={{
-          fontSize: "24px",
-        }}>
+        <Title
+          order={2}
+          mb="md"
+          style={{
+            fontSize: "24px",
+          }}
+        >
           Drafts
         </Title>
       )}
@@ -217,7 +220,7 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
-                  {file.fileType}
+                    {file.fileType}
                   </td>
                   <td
                     style={{

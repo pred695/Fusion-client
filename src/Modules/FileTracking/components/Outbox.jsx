@@ -4,7 +4,6 @@ import {
   Card,
   Title,
   Table,
-  Badge,
   ActionIcon,
   Tooltip,
   Select,
@@ -145,21 +144,29 @@ export default function Outboxfunc() {
       shadow="sm"
       padding="lg"
       radius="md"
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && !forwardFile && (
-        <Title order={2} mb="md" style={{
-          fontSize: "24px",
-        }}>
+        <Title
+          order={2}
+          mb="md"
+          style={{
+            fontSize: "24px",
+          }}
+        >
           Outbox
         </Title>
       )}
 
       {selectedFile ? (
         <div>
-          <Title order={3} mb="md" style={{
-          fontSize: "26px",
-        }}>
+          <Title
+            order={3}
+            mb="md"
+            style={{
+              fontSize: "26px",
+            }}
+          >
             File Subject
           </Title>
           <View
@@ -260,9 +267,7 @@ export default function Outboxfunc() {
                 >
                   Forward
                 </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
-                  Sent as
-                </th>
+
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   File ID
                 </th>
@@ -314,15 +319,7 @@ export default function Outboxfunc() {
                       </ActionIcon>
                     </Tooltip>
                   </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                    {file.fileType}
-                  </td>
+
                   <td
                     style={{
                       padding: "12px",

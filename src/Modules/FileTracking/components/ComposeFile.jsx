@@ -176,7 +176,13 @@ export default function Compose() {
         </Text>
       </Box>
 
-      <Title order={2} mb="md">
+      <Title
+        order={2}
+        mb="md"
+        style={{
+          fontSize: "24px",
+        }}
+      >
         Compose File
       </Title>
       <Box

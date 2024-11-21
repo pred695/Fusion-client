@@ -56,7 +56,7 @@ export default function SectionNavigation() {
   const ActiveComponent = sectionComponents[activeSection];
 
   return (
-    <Container size="xl" p="xs">
+    <Container size="xl" ml="-4" mt="1rem">
       {/* Section navigation */}
       <Group
         spacing={0}
@@ -64,7 +64,7 @@ export default function SectionNavigation() {
         style={{
           display: "flex",
           overflowX: "auto",
-          padding: "8px 0",
+          padding: "8px",
           borderBottom: "2px solid #E2E8F0",
         }}
       >
@@ -75,7 +75,7 @@ export default function SectionNavigation() {
             background: "#E2E8F0",
             border: "1.5px solid black",
             cursor: "pointer",
-            padding: "8px",
+            padding: "2.5px",
             borderRadius: "50%",
             outline: "none",
             margin: "0 8px",
@@ -84,7 +84,7 @@ export default function SectionNavigation() {
             justifyContent: "center",
           }}
         >
-          <CaretLeft size={20} weight="bold" color="#4A5568" />
+          <CaretLeft size={20} background="#FFFFFF" />
         </button>
         {sections.map((section) => (
           <Text
@@ -120,7 +120,7 @@ export default function SectionNavigation() {
             background: "#E2E8F0",
             border: "1.5px solid black", // Black border added
             cursor: "pointer",
-            padding: "8px",
+            padding: "2.5px",
             borderRadius: "50%",
             outline: "none",
             margin: "0 8px",
@@ -129,7 +129,7 @@ export default function SectionNavigation() {
             justifyContent: "center",
           }}
         >
-          <CaretRight size={20} weight="bold" color="#4A5568" />
+          <CaretRight size={20} background="#FFFFFF" />
         </button>
       </Group>
 
@@ -138,14 +138,14 @@ export default function SectionNavigation() {
         mt="md"
         style={{
           color: "#F5F7F8",
-          border: "2px solid rgba(0, 0, 0, 0.3)",
-          height: "500px",
+          // border: "2px solid rgba(0, 0, 0, 0.3)",
+          height: "400px",
           width: "100%",
           overflow: "auto",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "16px",
+          padding: "8px 0",
           boxSizing: "border-box",
         }}
       >

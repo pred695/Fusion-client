@@ -21,7 +21,6 @@ axios.defaults.withCredentials = true;
 // eslint-disable-next-line no-unused-vars
 export default function Compose() {
   const [file, setFile] = React.useState(null);
-  const [designation, setDesignation] = React.useState("");
   const [receiver_username, setReceiverUsername] = React.useState("");
   const [receiver_designation, setReceiverDesignation] = React.useState("");
   const [receiver_designations, setReceiverDesignations] = React.useState("");
@@ -29,6 +28,10 @@ export default function Compose() {
   const [description, setDescription] = React.useState("");
   const token = localStorage.getItem("authToken");
   const roles = useSelector((state) => state.user.roles);
+  let module = useSelector((state) => state.module.current_module);
+  module = module.split(" ").join("").toLowerCase();
+  const uploaderRole = useSelector((state) => state.user.role);
+  const [designation, setDesignation] = React.useState(uploaderRole);
   const options = roles.map((role) => ({ value: role, label: role }));
   const receiverRoles = Array.isArray(receiver_designations)
     ? receiver_designations.map((role) => ({
@@ -42,6 +45,15 @@ export default function Compose() {
   };
   const removeFile = () => {
     setFile(null);
+  };
+  const postSubmit = () => {
+    removeFile();
+    setDesignation("");
+    setReceiverDesignation("");
+    setReceiverDesignations("");
+    setReceiverUsername("");
+    setSubject("");
+    setDescription("");
   };
   useEffect(() => {
     setDesignation(roles);
@@ -58,13 +70,28 @@ export default function Compose() {
     );
     setReceiverDesignations(response.data.designations);
   };
-  const handleSaveDraft = () => {
+
+  const handleSaveDraft = async () => {
+    // const response = await axios.post(
+    //   "http://localhost:8000/filetracking/api/createdraft/",
+    //   {
+    //     designation: uploaderRole,
+    //     src_module: module,
+    //     file,
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Token ${token}`,
+    //     },
+    //   },
+    // );
     notifications.show({
-      title: "Draft Saved",
-      message: "File has been saved as draft",
-      color: "blue",
+      title: "Draft saved successfully",
+      message: "The draft has been saved successfully.",
+      color: "green",
       position: "top-center",
     });
+    postSubmit();
   };
   const handleCreateFile = async () => {
     if (!file) {
@@ -77,14 +104,16 @@ export default function Compose() {
       // eslint-disable-next-line no-useless-return
       return;
     }
-    const formData = new FormData();
-    formData.append("subject", subject);
-    formData.append("description", description);
-    formData.append("designation", designation);
-    formData.append("receiver_username", receiver_username);
-    formData.append("receiver_designation", receiver_designation);
-    formData.append("file", file); // Ensure this is the file object
+
     try {
+      const formData = new FormData();
+      formData.append("subject", subject);
+      formData.append("description", description);
+      formData.append("designation", designation);
+      formData.append("receiver_username", receiver_username);
+      formData.append("receiver_designation", receiver_designation);
+      formData.append("file", file); // Ensure this is the file object
+      formData.append("src_module", module);
       const response = await axios.post(
         "http://localhost:8000/filetracking/api/file/",
         formData,
@@ -94,7 +123,15 @@ export default function Compose() {
           },
         },
       );
-      console.log(response.data);
+      if (response.status === 201) {
+        notifications.show({
+          title: "File sent successfully",
+          message: "The file has been sent successfully.",
+          color: "green",
+          position: "top-center",
+        });
+        // postSubmit();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -191,12 +228,14 @@ export default function Compose() {
             </Button>
           </Group>
         )}
-        <Textarea label="Remark" placeholder="Enter remark" mb="sm" />
         <TextInput
           label="Forward To"
           placeholder="Enter forward recipient"
           value={receiver_username}
-          onChange={(e) => setReceiverUsername(e.target.value)}
+          onChange={(e) => {
+            setReceiverDesignation("");
+            setReceiverUsername(e.target.value);
+          }}
           mb="sm"
         />
         {/* Receiver Designation as a dropdown */}

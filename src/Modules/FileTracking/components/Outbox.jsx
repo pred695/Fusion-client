@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -11,61 +11,77 @@ import {
   Textarea,
   Button,
   Group,
+  TextInput,
 } from "@mantine/core";
 import { ArrowArcRight, Eye } from "@phosphor-icons/react";
-import ViewFiles from "./ViewFile";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import View from "./ViewFile";
 
 export default function Outboxfunc() {
-  const [files] = useState([
-    {
-      fileType: "PDF",
-      sentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#596",
-      subject: "Fusion Project Module",
-      date: "Nov 16, 2023, 11:26 p.m",
-    },
-    {
-      fileType: "PDF",
-      sentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#597",
-      subject: "Another Project Module",
-      date: "Nov 16, 2023, 11:26 p.m",
-    },
-  ]);
-
+  const [files, setFiles] = useState([]);
+  const token = localStorage.getItem("authToken");
+  const role = useSelector((state) => state.user.role);
+  const username = useSelector((state) => state.user.name);
+  let current_module = useSelector((state) => state.module.current_module);
+  current_module = current_module.split(" ").join("").toLowerCase();
+  const convertDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleString();
+  };
+  const [receiver_username, setReceiverUsername] = React.useState("");
+  const [receiver_designation, setReceiverDesignation] = React.useState("");
+  const [receiver_designations, setReceiverDesignations] = React.useState("");
   const [selectedFile, setSelectedFile] = useState(null); // For viewing file details
   const [forwardFile, setForwardFile] = useState(null); // For forwarding file
-  const [recipientDesignation, setRecipientDesignation] = useState(""); // State for recipient's designation
-  const [recipient, setRecipient] = useState(""); // State for next person to forward to
+
   const [remarks, setRemarks] = useState(""); // State for remarks
+  const receiverRoles = Array.isArray(receiver_designations)
+    ? receiver_designations.map((receiver_role) => ({
+        value: receiver_role,
+        label: receiver_role,
+      }))
+    : [];
+  useEffect(() => {
+    const getFiles = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/outbox/`,
 
-  // Available designation options for forwarding
-  const designationOptions = [
-    { value: "Manager", label: "Manager" },
-    { value: "TeamLead", label: "Team Lead" },
-    { value: "Employee", label: "Employee" },
-  ];
+          {
+            params: {
+              username,
+              designation: role,
+              src_module: current_module,
+            },
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          },
+        );
+        // Set the response data to the files state
+        setFiles(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+      }
+    };
 
-  // Available users based on designation
-  const usersByDesignation = {
-    Manager: [
-      { value: "JohnManager", label: "John (Manager)" },
-      { value: "JaneManager", label: "Jane (Manager)" },
-    ],
-    TeamLead: [
-      { value: "AliceLead", label: "Alice (Team Lead)" },
-      { value: "BobLead", label: "Bob (Team Lead)" },
-    ],
-    Employee: [
-      { value: "CharlieEmp", label: "Charlie (Employee)" },
-      { value: "DanaEmp", label: "Dana (Employee)" },
-    ],
+    // Call the getFiles function to fetch data on component mount
+    getFiles();
+  }, []);
+  const fetchRoles = async () => {
+    const response = await axios.get(
+      `http://localhost:8000/filetracking/api/designations/${receiver_username}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    );
+    setReceiverDesignations(response.data.designations);
   };
-
-  const handleViewFile = (file) => {
-    setSelectedFile(file);
-  };
-
   const handleBack = () => {
     setSelectedFile(null);
     setForwardFile(null); // Reset forward file state
@@ -75,17 +91,53 @@ export default function Outboxfunc() {
     setForwardFile(file); // Set the file to be forwarded
   };
 
-  const handleSubmitForward = () => {
-    console.log("File Forwarded:", forwardFile);
-    console.log("Recipient Designation:", recipientDesignation);
-    console.log("Forwarding To:", recipient);
-    console.log("Remarks:", remarks);
+  const handleSubmitForward = async () => {
+    try {
+      let response = await axios.get(
+        `http://localhost:8000/filetracking/api/file/${forwardFile.id}`,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
 
-    // Reset form and state
-    setForwardFile(null);
-    setRecipientDesignation(""); // Reset designation
-    setRecipient("");
-    setRemarks("");
+      setForwardFile(response.data);
+      const fileAttachment =
+        forwardFile.upload_file instanceof File
+          ? forwardFile.upload_file
+          : new File([forwardFile.upload_file], "uploaded_file", {
+              type: "application/octet-stream",
+            });
+
+      console.log(forwardFile.upload_file);
+      const formData = new FormData();
+      formData.append("file_attachment", fileAttachment);
+      console.log(receiver_username);
+      formData.append("receiver", receiver_username);
+      formData.append("receiver_designation", receiver_designation);
+      formData.append("remarks", remarks);
+      console.log(formData);
+      console.log(forwardFile.id);
+      response = await axios.post(
+        `http://localhost:8000/filetracking/api/forwardfile/${forwardFile.id}/`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+      // Reset form and state
+      setForwardFile(null);
+      setReceiverDesignation(""); // Reset designation
+      setReceiverUsername("");
+      setRemarks("");
+    } catch (err) {
+      console.error("Error forwarding file:", err);
+    }
   };
 
   return (
@@ -107,7 +159,13 @@ export default function Outboxfunc() {
           <Title order={3} mb="md">
             File Subject
           </Title>
-          <ViewFiles file={selectedFile} onBack={handleBack} />
+          <View
+            onBack={handleBack}
+            fileID={selectedFile.id}
+            updateFiles={() =>
+              setFiles(files.filter((f) => f.id !== selectedFile.id))
+            }
+          />
         </div>
       ) : forwardFile ? (
         <div
@@ -124,26 +182,25 @@ export default function Outboxfunc() {
           </Title>
           <Box>
             {/* Step 1: Select the recipient's designation */}
-            <Select
-              label="Recipient's Designation"
-              placeholder="Select designation"
-              data={designationOptions} // Options for designation
-              value={recipientDesignation}
-              onChange={setRecipientDesignation}
-              style={{ marginBottom: "1rem" }} // Add space between fields
+            <TextInput
+              label="Forward To"
+              placeholder="Enter forward recipient"
+              value={receiver_username}
+              onChange={(e) => {
+                setReceiverUsername(e.target.value);
+              }}
+              mb="sm"
             />
-
-            {/* Step 2: Based on selected designation, allow selection of recipient */}
-            {recipientDesignation && (
-              <Select
-                label="Forward to"
-                placeholder="Select recipient"
-                data={usersByDesignation[recipientDesignation]} // Dynamic options based on designation
-                value={recipient}
-                onChange={setRecipient}
-                style={{ marginBottom: "1rem" }} // Add space between fields
-              />
-            )}
+            {/* Receiver Designation as a dropdown */}
+            <Select
+              label="Receiver Designation"
+              placeholder="Select designation"
+              onClick={() => fetchRoles()}
+              value={receiver_designation}
+              data={receiverRoles}
+              mb="sm"
+              onChange={(value) => setReceiverDesignation(value)}
+            />
 
             {/* Remarks Textarea */}
             <Textarea
@@ -201,9 +258,6 @@ export default function Outboxfunc() {
                 </th>
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   Sent as
-                </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
-                  Sent To
                 </th>
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   File ID
@@ -274,16 +328,7 @@ export default function Outboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    {file.sentTo}
-                  </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                    {file.fileID}
+                    {file.id}
                   </td>
                   <td
                     style={{
@@ -301,7 +346,7 @@ export default function Outboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    {file.date}
+                    {convertDate(file.upload_date)}
                   </td>
                   <td
                     style={{
@@ -319,7 +364,7 @@ export default function Outboxfunc() {
                           width: "2rem",
                           height: "2rem",
                         }}
-                        onClick={() => handleViewFile(file)}
+                        onClick={() => setSelectedFile(file)}
                         onMouseEnter={(e) => {
                           e.target.style.backgroundColor = "#E3F2FD";
                         }}

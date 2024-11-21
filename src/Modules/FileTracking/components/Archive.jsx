@@ -110,7 +110,13 @@ export default function ArchiveFiles() {
           <Title order={3} mb="md">
             File Subject
           </Title>
-          <View file={selectedFile} onBack={handleBack} />
+          <View
+            onBack={handleBack}
+            fileID={selectedFile.id}
+            updateFiles={() =>
+              setFiles(files.filter((f) => f.id !== selectedFile.id))
+            }
+          />
         </div>
       ) : (
         <Box

@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Card,
-  Title,
-  Table,
-  Badge,
-  ActionIcon,
-  Tooltip,
-} from "@mantine/core";
+import { Box, Card, Title, Table, ActionIcon, Tooltip } from "@mantine/core";
 import { Archive, Eye } from "@phosphor-icons/react";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -97,28 +89,28 @@ export default function Inboxfunc() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
-          <Title
-            order={2}
-            mb="md"
-            style={{
-              fontSize: "24px", 
-            }}
-          >
-            Inbox
-          </Title>
-        )}
+        <Title
+          order={2}
+          mb="md"
+          style={{
+            fontSize: "24px",
+          }}
+        >
+          Inbox
+        </Title>
+      )}
       {selectedFile ? (
         <div>
-           <Title
-              order={3}
-              mb="md"
-              style={{
-                fontSize: "26px",
-              }}
-            >
+          <Title
+            order={3}
+            mb="md"
+            style={{
+              fontSize: "26px",
+            }}
+          >
             File Subject
           </Title>
           <View
@@ -159,9 +151,7 @@ export default function Inboxfunc() {
                 >
                   Archive
                 </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
-                  Received as
-                </th>
+
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   Sent By
                 </th>
@@ -216,16 +206,7 @@ export default function Inboxfunc() {
                       </ActionIcon>
                     </Tooltip>
                   </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                      {file.name}
-                   
-                  </td>
+
                   <td
                     style={{
                       padding: "12px",

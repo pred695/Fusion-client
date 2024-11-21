@@ -101,7 +101,8 @@ export default function Draft() {
       shadow="sm"
       padding="lg"
       radius="md"
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
+      withBorder
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
     >
       {!editFile && (
         <Title

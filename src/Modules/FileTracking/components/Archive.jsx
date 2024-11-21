@@ -96,18 +96,21 @@ export default function ArchiveFiles() {
       shadow="sm"
       padding="lg"
       radius="md"
-      withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
     >
       {!selectedFile && (
-        <Title order={2} mb="md">
+        <Title order={2} mb="md"   style={{
+          fontSize: "24px",
+        }}>
           Archived Files
         </Title>
       )}
 
       {selectedFile ? (
         <div>
-          <Title order={3} mb="md">
+          <Title order={3} mb="md"   style={{
+            fontSize: "26px",
+          }}>
             File Subject
           </Title>
           <View
@@ -134,10 +137,11 @@ export default function ArchiveFiles() {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              fontSize: "14px",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
                 <th style={{ ...tableStyles, width: "12%" }}>Received As</th>
                 <th style={{ ...tableStyles, width: "18%" }}>Sent By</th>
@@ -158,7 +162,7 @@ export default function ArchiveFiles() {
                     >
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         onClick={() => handleToggleArchive(file.id)}
                         style={{ width: "2rem", height: "2rem" }}
                       >
@@ -173,9 +177,7 @@ export default function ArchiveFiles() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                    {file.fileType}
                   </td>
                   <td style={tableStyles}>{file.uploader}</td>
                   <td style={tableStyles}>{file.id}</td>
@@ -184,7 +186,7 @@ export default function ArchiveFiles() {
                   <td style={tableStyles}>
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       onClick={() => handleViewFile(file)}
                       style={{ width: "2rem", height: "2rem" }}
                     >

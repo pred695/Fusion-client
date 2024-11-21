@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Card,
-  Title,
-  Table,
-  ActionIcon,
-  Tooltip,
-  Badge,
-} from "@mantine/core";
+import { Box, Card, Title, Table, ActionIcon, Tooltip } from "@mantine/core";
 import { ArrowArcLeft, Eye } from "@phosphor-icons/react";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -96,21 +88,29 @@ export default function ArchiveFiles() {
       shadow="sm"
       padding="lg"
       radius="md"
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin: "32px" }}
     >
       {!selectedFile && (
-        <Title order={2} mb="md"   style={{
-          fontSize: "24px",
-        }}>
+        <Title
+          order={2}
+          mb="md"
+          style={{
+            fontSize: "24px",
+          }}
+        >
           Archived Files
         </Title>
       )}
 
       {selectedFile ? (
         <div>
-          <Title order={3} mb="md"   style={{
-            fontSize: "26px",
-          }}>
+          <Title
+            order={3}
+            mb="md"
+            style={{
+              fontSize: "26px",
+            }}
+          >
             File Subject
           </Title>
           <View
@@ -143,7 +143,6 @@ export default function ArchiveFiles() {
             <thead>
               <tr style={{ backgroundColor: "#0000" }}>
                 <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
-                <th style={{ ...tableStyles, width: "12%" }}>Received As</th>
                 <th style={{ ...tableStyles, width: "18%" }}>Sent By</th>
                 <th style={{ ...tableStyles, width: "15%" }}>File ID</th>
                 <th style={{ ...tableStyles, width: "25%" }}>Subject</th>
@@ -170,15 +169,7 @@ export default function ArchiveFiles() {
                       </ActionIcon>
                     </Tooltip>
                   </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                    {file.fileType}
-                  </td>
+
                   <td style={tableStyles}>{file.uploader}</td>
                   <td style={tableStyles}>{file.id}</td>
                   <td style={tableStyles}>{file.subject}</td>

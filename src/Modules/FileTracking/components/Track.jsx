@@ -1,39 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
   Title,
   Table,
   Button,
-  Badge,
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
 import { Archive, Eye } from "@phosphor-icons/react";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import ViewFileStatus from "./ViewFileStatus";
 
 export default function Track() {
-  const [files, setFiles] = useState([
-    {
-      fileType: "PDF",
-      sentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#596",
-      subject: "Fusion Project Module",
-      progress: 50,
-    },
-    {
-      fileType: "PDF",
-      sentTo: "Employee-Myself",
-      fileID: "CSE-2023-11-#597",
-      subject: "Another Project Module",
-      progress: 75,
-    },
-  ]);
-
+  const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-
-  const handleArchive = (fileID) => {
-    const updatedFiles = files.filter((file) => file.fileID !== fileID);
+  const token = localStorage.getItem("authToken");
+  const role = useSelector((state) => state.user.role);
+  const username = useSelector((state) => state.user.name);
+  let current_module = useSelector((state) => state.module.current_module);
+  current_module = current_module.split(" ").join("").toLowerCase();
+  const convertDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleString();
+  };
+  const handleArchive = async (fileID) => {
+    // eslint-disable-next-line no-unused-vars
+    const response = await axios.post(
+      "http://localhost:8000/filetracking/api/createarchive/",
+      {
+        file_id: fileID,
+      },
+      {
+        params: {
+          username,
+          designation: role,
+          src_module: current_module,
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    );
+    const updatedFiles = files.filter((file) => file.id !== fileID);
     setFiles(updatedFiles);
   };
 
@@ -45,6 +56,31 @@ export default function Track() {
     setSelectedFile(null);
   };
 
+  useEffect(() => {
+    const getFiles = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/filetracking/api/inbox/`,
+
+          {
+            params: {
+              username,
+              designation: role,
+              src_module: current_module,
+            },
+            withCredentials: true,
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          },
+        );
+        setFiles(response.data);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+      }
+    };
+    getFiles();
+  }, []);
   return (
     <Card
       shadow="sm"
@@ -64,8 +100,13 @@ export default function Track() {
           <Title order={3} mb="md">
             File Status
           </Title>
-          <ViewFileStatus file={selectedFile} onBack={handleBack} />{" "}
-          {/* Updated component */}
+          <ViewFileStatus
+            onBack={handleBack}
+            fileID={selectedFile.id}
+            updateFiles={() =>
+              setFiles(files.filter((f) => f.id !== selectedFile.id))
+            }
+          />
         </div>
       ) : (
         <Box
@@ -97,16 +138,13 @@ export default function Track() {
                   Archive
                 </th>
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
-                  Sent as
-                </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
-                  Sent To
-                </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   File ID
                 </th>
                 <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   Subject
+                </th>
+                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  Date
                 </th>
                 <th
                   style={{
@@ -142,7 +180,7 @@ export default function Track() {
                       <ActionIcon
                         variant="light"
                         color="red"
-                        onClick={() => handleArchive(file.fileID)}
+                        onClick={() => handleArchive(file.id)}
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
@@ -166,27 +204,7 @@ export default function Track() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
-                  </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                    {file.sentTo}
-                  </td>
-                  <td
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                  >
-                    {file.fileID}
+                    {file.id}
                   </td>
                   <td
                     style={{
@@ -196,6 +214,15 @@ export default function Track() {
                     }}
                   >
                     {file.subject}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px",
+                      border: "1px solid #ddd",
+                      textAlign: "center",
+                    }}
+                  >
+                    {convertDate(file.upload_date)}
                   </td>
                   <td
                     style={{

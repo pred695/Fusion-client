@@ -102,11 +102,12 @@ export default function Draft() {
       shadow="sm"
       padding="lg"
       radius="md"
-      withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
     >
       {!editFile && (
-        <Title order={2} mb="md">
+        <Title order={2} mb="md" style={{
+          fontSize: "24px",
+        }}>
           Drafts
         </Title>
       )}
@@ -129,14 +130,15 @@ export default function Draft() {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              fontSize: "14px",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th
                   style={{
                     padding: "12px",
-                    width: "6%",
+                    width: "8%",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -187,7 +189,7 @@ export default function Draft() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         onClick={() => handleArchive(file.id)}
                         style={{
                           transition: "background-color 0.3s",
@@ -215,9 +217,7 @@ export default function Draft() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.fileType}
-                    </Badge>
+                  {file.fileType}
                   </td>
                   <td
                     style={{
@@ -284,7 +284,7 @@ export default function Draft() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",

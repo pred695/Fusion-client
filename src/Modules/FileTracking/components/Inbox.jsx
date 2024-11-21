@@ -97,16 +97,28 @@ export default function Inboxfunc() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%", margin:"32px" }}
     >
       {!selectedFile && (
-        <Title order={2} mb="md">
-          Inbox
-        </Title>
-      )}
+          <Title
+            order={2}
+            mb="md"
+            style={{
+              fontSize: "24px", 
+            }}
+          >
+            Inbox
+          </Title>
+        )}
       {selectedFile ? (
         <div>
-          <Title order={3} mb="md">
+           <Title
+              order={3}
+              mb="md"
+              style={{
+                fontSize: "26px",
+              }}
+            >
             File Subject
           </Title>
           <View
@@ -133,10 +145,11 @@ export default function Inboxfunc() {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              fontSize: "14px",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#F0F0F0" }}>
+              <tr style={{ backgroundColor: "#0000" }}>
                 <th
                   style={{
                     padding: "12px",
@@ -185,7 +198,7 @@ export default function Inboxfunc() {
                     <Tooltip label="Archive file" position="top" withArrow>
                       <ActionIcon
                         variant="light"
-                        color="red"
+                        color="blue"
                         style={{
                           transition: "background-color 0.3s",
                           width: "2rem",
@@ -210,9 +223,8 @@ export default function Inboxfunc() {
                       textAlign: "center",
                     }}
                   >
-                    <Badge color="gray" style={{ fontSize: "12px" }}>
-                      File type: {file.name}
-                    </Badge>
+                      {file.name}
+                   
                   </td>
                   <td
                     style={{
@@ -261,7 +273,7 @@ export default function Inboxfunc() {
                   >
                     <ActionIcon
                       variant="outline"
-                      color="gray"
+                      color="black"
                       style={{
                         transition: "background-color 0.3s",
                         width: "2rem",

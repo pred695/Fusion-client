@@ -13,6 +13,7 @@ import { Trash, ArrowLeft } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications"; // Import for notifications
 import PropTypes from "prop-types";
 import axios from "axios";
+import { historyRoute } from "../../../routes/filetrackingRoutes";
 
 export default function FileStatusPage({ onBack, fileID, updateFiles }) {
   const [fileHistory, setFileHistory] = useState(null); // To store API response data
@@ -20,15 +21,12 @@ export default function FileStatusPage({ onBack, fileID, updateFiles }) {
   useEffect(() => {
     const getHistory = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/filetracking/api/history/${fileID}`,
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Token ${localStorage.getItem("authToken")}`,
-            },
+        const response = await axios.get(`${historyRoute}${fileID}`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Token ${localStorage.getItem("authToken")}`,
           },
-        );
+        });
         setFileHistory(response.data[0]); // Set the response data
       } catch (err) {
         console.error("Error fetching history:", err);

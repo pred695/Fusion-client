@@ -7,11 +7,12 @@ import {
   TextInput,
   Textarea,
   Title,
+  ActionIcon,
   Text,
   Select,
   Group,
 } from "@mantine/core";
-import { Upload, Trash } from "@phosphor-icons/react";
+import { Upload, FloppyDisk, Trash } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -21,7 +22,7 @@ import {
 } from "../../../routes/filetrackingRoutes";
 
 axios.defaults.withCredentials = true;
-
+// eslint-disable-next-line no-unused-vars
 export default function Compose() {
   const [file, setFile] = React.useState(null);
   const [receiver_username, setReceiverUsername] = React.useState("");
@@ -46,11 +47,9 @@ export default function Compose() {
   const handleFileChange = (uploadedFile) => {
     setFile(uploadedFile);
   };
-
   const removeFile = () => {
     setFile(null);
   };
-
   const postSubmit = () => {
     removeFile();
     setDesignation("");
@@ -60,12 +59,10 @@ export default function Compose() {
     setSubject("");
     setDescription("");
   };
-
   useEffect(() => {
     setDesignation(roles);
-    console.log("Receiver Roles:", receiverRoles);
+    console.log(receiverRoles);
   }, [roles, receiverRoles]);
-  // eslint-disable-next-line no-unused-vars
   const fetchRoles = async () => {
     const response = await axios.get(
       `${designationsRoute}${receiver_username}`,
@@ -77,8 +74,21 @@ export default function Compose() {
     );
     setReceiverDesignations(response.data.designations);
   };
-  // eslint-disable-next-line no-unused-vars
+
   const handleSaveDraft = async () => {
+    // const response = await axios.post(
+    //   `${draftRoute}`,
+    //   {
+    //     designation: uploaderRole,
+    //     src_module: module,
+    //     file,
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Token ${token}`,
+    //     },
+    //   },
+    // );
     notifications.show({
       title: "Draft saved successfully",
       message: "The draft has been saved successfully.",
@@ -87,15 +97,15 @@ export default function Compose() {
     });
     postSubmit();
   };
-
   const handleCreateFile = async () => {
     if (!file) {
       notifications.show({
         title: "Error",
-        message: "Please upload a file.",
+        message: "Please upload a file",
         color: "red",
         position: "top-center",
       });
+      // eslint-disable-next-line no-useless-return
       return;
     }
 
@@ -112,7 +122,7 @@ export default function Compose() {
       formData.append("designation", designation);
       formData.append("receiver_username", receiver_username);
       formData.append("receiver_designation", receiver_designation);
-      formData.append("file", fileAttachment);
+      formData.append("file", fileAttachment); // Ensure this is the file object
       formData.append("src_module", module);
       const response = await axios.post(`${createFileRoute}`, formData, {
         headers: {
@@ -126,21 +136,66 @@ export default function Compose() {
           color: "green",
           position: "top-center",
         });
+        // postSubmit();
       }
     } catch (err) {
-      console.error("Error sending file:", err);
+      console.log(err);
     }
   };
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={2} mb="md">
+    <Card
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+      style={{ backgroundColor: "#F5F7F8", position: "relative" }}
+    >
+      {/* Icon at Top Right with Text Beneath */}
+      <Box
+        style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <ActionIcon
+          size="lg"
+          variant="outline"
+          color="blue"
+          onClick={() => handleSaveDraft()}
+          title="Save as Draft"
+        >
+          <FloppyDisk size={20} />
+        </ActionIcon>
+        <Text color="blue" size="xs" mt={4}>
+          Save as Draft
+        </Text>
+      </Box>
+
+      <Title
+        order={2}
+        mb="md"
+        style={{
+          fontSize: "24px",
+        }}
+      >
         Compose File
       </Title>
-      <Box component="form" onSubmit={(e) => e.preventDefault()}>
+      <Box
+        component="form"
+        onSubmit={(e) => e.preventDefault()}
+        style={{
+          backgroundColor: "#F5F7F8",
+          padding: "16px",
+        }}
+      >
         <TextInput
           label="Title of File"
-          placeholder="Enter file title here"
+          placeholder="Enter file title"
           mb="sm"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
@@ -148,7 +203,7 @@ export default function Compose() {
         />
         <Textarea
           label="Description"
-          placeholder="Enter description here"
+          placeholder="Enter description"
           mb="sm"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -156,7 +211,7 @@ export default function Compose() {
         />
         <Select
           label="Designation"
-          placeholder="Select Sender's Designation"
+          placeholder="Sender's Designation"
           value={designation}
           data={options}
           mb="sm"
@@ -164,11 +219,11 @@ export default function Compose() {
         />
         <FileInput
           label="Attach file (PDF, JPG, PNG) (MAX: 10MB)"
-          placeholder="Upload your file"
+          placeholder="Upload file"
           accept="application/pdf,image/jpeg,image/png"
           icon={<Upload size={16} />}
-          value={file}
-          onChange={handleFileChange}
+          value={file} // Set the file state as the value
+          onChange={handleFileChange} // Update file state on change
           mb="sm"
           withAsterisk
         />
@@ -185,10 +240,35 @@ export default function Compose() {
             </Button>
           </Group>
         )}
+        <TextInput
+          label="Forward To"
+          placeholder="Enter forward recipient"
+          value={receiver_username}
+          onChange={(e) => {
+            setReceiverDesignation("");
+            setReceiverUsername(e.target.value);
+          }}
+          mb="sm"
+        />
+        {/* Receiver Designation as a dropdown */}
+        <Select
+          label="Receiver Designation"
+          placeholder="Select designation"
+          onClick={() => fetchRoles()}
+          value={receiver_designation}
+          data={receiverRoles}
+          mb="sm"
+          onChange={(value) => setReceiverDesignation(value)}
+        />
+
         <Button
           type="submit"
           color="blue"
-          style={{ display: "block", margin: "0 auto", width: "200px" }}
+          style={{
+            display: "block",
+            margin: "0 auto",
+            width: "200px",
+          }}
           onClick={handleCreateFile}
         >
           Submit

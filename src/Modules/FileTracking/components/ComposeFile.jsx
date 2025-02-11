@@ -12,6 +12,7 @@ import {
   Select,
   Group,
   Autocomplete,
+  Grid,
 } from "@mantine/core";
 import { Upload, FloppyDisk, Trash } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
@@ -280,27 +281,30 @@ export default function Compose() {
             </Button>
           </Group>
         )}
-        <Autocomplete
-          label="Forward To"
-          placeholder="Enter forward recipient"
-          value={receiver_username}
-          data={usernameSuggestions} // Pass the array of suggestions
-          onChange={(value) => {
-            setReceiverDesignation("");
-            setReceiverUsername(value);
-          }}
-          mb="sm"
-        />
-        {/* Receiver Designation as a dropdown */}
-        <Select
-          label="Receiver Designation"
-          placeholder="Select designation"
-          onClick={() => fetchRoles()}
-          value={receiver_designation}
-          data={receiverRoles}
-          mb="sm"
-          onChange={(value) => setReceiverDesignation(value)}
-        />
+        <Grid mb="sm" gutter="sm">
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Autocomplete
+              label="Forward To"
+              placeholder="Enter forward recipient"
+              value={receiver_username}
+              data={usernameSuggestions} // Pass the array of suggestions
+              onChange={(value) => {
+                setReceiverDesignation("");
+                setReceiverUsername(value);
+              }}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Select
+              label="Receiver Designation"
+              placeholder="Select designation"
+              onClick={() => fetchRoles()}
+              value={receiver_designation}
+              data={receiverRoles}
+              onChange={(value) => setReceiverDesignation(value)}
+            />
+          </Grid.Col>
+        </Grid>
         <Button
           type="submit"
           color="blue"

@@ -1,16 +1,14 @@
 import {
-  Anchor,
   Button,
   Center,
   Container,
-  Group,
   Paper,
   PasswordInput,
   TextInput,
   Title,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
 import { useDispatch } from "react-redux";
@@ -42,6 +40,11 @@ function LoginPage() {
 
       if (response.status === 200) {
         dispatch(setName(username));
+        notifications.show({
+          title: "Login Successful",
+          message: "You have been successfully logged in.",
+          color: "green",
+        });
         const { token } = response.data;
 
         localStorage.setItem("authToken", token);
@@ -50,12 +53,14 @@ function LoginPage() {
     } catch (err) {
       console.error("Login error:", err);
 
-      if (err.response?.status === 401) {
+      if (err.response?.status === 400) {
         notifications.show({
           title: "Login Failed",
-          message: "Invalid username or password",
+          message:
+            "Invalid username or password ! Please use correct credentials.",
           color: "red",
           position: "top-center",
+          withCloseButton: false,
         });
       } else {
         notifications.show({
@@ -113,13 +118,6 @@ function LoginPage() {
                 }
               }}
             />
-            <Group justify="space-between" mt="lg">
-              <Link style={{ textDecoration: "none" }} to="/reset-password">
-                <Anchor component="button" size="sm" c="#15ABFF">
-                  Forgot password?
-                </Anchor>
-              </Link>
-            </Group>
             <Button
               fullWidth
               size="md"

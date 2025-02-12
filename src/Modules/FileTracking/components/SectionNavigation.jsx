@@ -60,7 +60,6 @@ export default function SectionNavigation() {
       {/* Section navigation */}
       <Group
         spacing={0}
-        noWrap
         style={{
           display: "flex",
           overflowX: "auto",
@@ -139,7 +138,6 @@ export default function SectionNavigation() {
         style={{
           color: "#F5F7F8",
           // border: "2px solid rgba(0, 0, 0, 0.3)",
-          height: "400px",
           width: "100%",
           overflow: "auto",
           display: "flex",

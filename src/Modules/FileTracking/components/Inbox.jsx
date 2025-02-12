@@ -112,8 +112,8 @@ export default function Inboxfunc() {
         .files-container {
           border: 1px solid #ddd;
           border-radius: 8px;
-          overflow-y: auto;
-          height: 400px;
+          overflow-y: scroll;
+          height: 100vh;
           background-color: #fff;
         }
         
@@ -253,7 +253,16 @@ export default function Inboxfunc() {
             />
           </div>
         ) : (
-          <Box className="files-container">
+          <Box
+            className="files-container"
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              overflowY: "scroll",
+              height: "57vh",
+              backgroundColor: "#fff",
+            }}
+          >
             <div className="table-scroll-wrapper">
               <Table className="files-table" highlightOnHover>
                 <thead>

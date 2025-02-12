@@ -128,7 +128,7 @@ export default function Draft() {
             border: "1px solid #ddd",
             borderRadius: "8px",
             overflowY: "auto",
-            height: "400px",
+            height: "56vh",
             backgroundColor: "#fff",
           }}
         >
@@ -152,16 +152,34 @@ export default function Draft() {
                 >
                   Archive
                 </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
+                {/* <th style={{ padding: "12px", border: "1px solid #ddd" }}>
                   File type
-                </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
+                </th> */}
+                <th
+                  style={{
+                    padding: "12px",
+                    width: "12%",
+                    border: "1px solid #ddd",
+                  }}
+                >
                   Being Sent to
                 </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
+                <th
+                  style={{
+                    padding: "12px",
+                    width: "12%",
+                    border: "1px solid #ddd",
+                  }}
+                >
                   File ID
                 </th>
-                <th style={{ padding: "12px", border: "1px solid #ddd" }}>
+                <th
+                  style={{
+                    padding: "12px",
+                    width: "33%",
+                    border: "1px solid #ddd",
+                  }}
+                >
                   Subject
                 </th>
                 <th
@@ -218,7 +236,7 @@ export default function Draft() {
                       </ActionIcon>
                     </Tooltip>
                   </td>
-                  <td
+                  {/* <td
                     style={{
                       padding: "12px",
                       border: "1px solid #ddd",
@@ -226,7 +244,7 @@ export default function Draft() {
                     }}
                   >
                     {file.fileType}
-                  </td>
+                  </td> */}
                   <td
                     style={{
                       padding: "12px",

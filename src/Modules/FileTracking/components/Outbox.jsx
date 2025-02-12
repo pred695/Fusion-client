@@ -247,7 +247,7 @@ export default function Outboxfunc() {
             border: "1px solid #ddd",
             borderRadius: "8px",
             overflowY: "auto",
-            height: "400px",
+            height: "56vh",
             backgroundColor: "#fff",
           }}
         >

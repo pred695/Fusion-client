@@ -1,7 +1,7 @@
 import React from "react";
 import { useMantineTheme } from "@mantine/core";
 import { useDispatch } from "react-redux";
-import SectionNavigation from "./components/sectionNavigation";
+import SectionNavigation from "./components/SectionNavigation";
 import CustomBreadcrumbs from "../../components/Breadcrumbs";
 import { setActiveTab_, setCurrentModule } from "../../redux/moduleslice";
 
@@ -17,7 +17,7 @@ function FileTracking() {
         style={{
           display: "flex",
           flexDirection: "row",
-          height: "90vh",
+          height: "80vh",
           overflow: "hidden",
         }}
       >

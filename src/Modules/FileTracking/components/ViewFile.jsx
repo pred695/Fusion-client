@@ -85,7 +85,7 @@ export default function View({ onBack, fileID, updateFiles }) {
       withBorder
       style={{
         backgroundColor: "#FFFFFF",
-        minHeight: "100vh",
+        minHeight: "10vh",
         padding: "2rem",
       }}
     >

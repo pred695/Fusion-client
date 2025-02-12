@@ -60,7 +60,7 @@ export default function FileStatusPage({ onBack, fileID, updateFiles }) {
       withBorder
       style={{
         backgroundColor: "#F5F7F8",
-        minHeight: "100vh",
+        minHeight: "59vh",
       }}
     >
       {/* Header with Back and Delete buttons */}

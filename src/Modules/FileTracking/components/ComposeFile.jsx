@@ -130,6 +130,10 @@ export default function Compose() {
       }
     }
   };
+  useEffect(() => {
+    setReceiverDesignation("");
+    setReceiverDesignations("");
+  }, [receiver_username]);
   const handleSaveDraft = async () => {
     try {
       const formData = new FormData();
@@ -347,8 +351,9 @@ export default function Compose() {
                 value={receiver_username}
                 data={usernameSuggestions}
                 onChange={(value) => {
-                  setReceiverDesignation("");
-                  setReceiverUsername(value);
+                  setReceiverUsername(value); // update username
+                  setReceiverDesignation(""); // reset designation
+                  setReceiverDesignations("");
                 }}
                 styles={(theme) => ({
                   label: {
@@ -361,19 +366,17 @@ export default function Compose() {
               />
             </Box>
           </Grid.Col>
+
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Box style={{ height: "100%", width: "99%" }}>
               <Select
+                key={receiver_username}
                 label="Receiver Designation"
                 placeholder="Select designation"
-                onClick={() => {
-                  if (receiverRoles.length === 0) {
-                    fetchRoles();
-                  }
-                }}
                 value={receiver_designation}
                 data={receiverRoles}
                 onChange={(value) => setReceiverDesignation(value)}
+                onClick={() => fetchRoles()} // only triggers on click
                 searchable
                 nothingFound="No designations found"
                 styles={(theme) => ({
@@ -388,6 +391,7 @@ export default function Compose() {
             </Box>
           </Grid.Col>
         </Grid>
+
         <Button
           type="submit"
           color="blue"

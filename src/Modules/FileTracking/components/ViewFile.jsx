@@ -637,6 +637,7 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
               color="blue"
               onClick={() => openForwardModal(file)}
               loading={isForwarding}
+              disabled={!receiver_designation || !receiver_username || !remarks}
             >
               Forward File
             </Button>
@@ -665,8 +666,10 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
         }
         centered
       >
-        <Text weight={600} mb="md">
-          Are you sure you want to forward this file?
+        <Text weight={600}>Are you sure you want to forward this file?</Text>
+        <Text weight={600}>From: {file.uploader}</Text>
+        <Text>
+          To: {receiver_username}({receiver_designation})
         </Text>
         {selectedForwardFile && (
           <>

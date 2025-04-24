@@ -207,14 +207,10 @@ export default function Outboxfunc() {
                 <tr style={{ backgroundColor: "#0000" }}>
                   {[
                     { key: "id", label: "File ID" },
-                    { key: "uploader", label: "Owner" },
                     { key: "sent_to", label: "Sent to" },
-                    {
-                      key: "receiver_designation",
-                      label: "Receiver's Designation",
-                    },
                     { key: "subject", label: "Subject" },
                     { key: "upload_date", label: "Date" },
+                    { key: "uploader", label: "Created by" },
                   ].map(({ key, label }) => (
                     <th
                       key={key}
@@ -271,6 +267,7 @@ export default function Outboxfunc() {
                       >
                         {`${file.branch}-${new Date(file.upload_date).getFullYear()}-${(new Date(file.upload_date).getMonth() + 1).toString().padStart(2, "0")}-#${file.id}`}
                       </td>
+
                       <td
                         style={{
                           padding: "6px",
@@ -279,27 +276,7 @@ export default function Outboxfunc() {
                           height: "36px",
                         }}
                       >
-                        {file.uploader}
-                      </td>
-                      <td
-                        style={{
-                          padding: "6px",
-                          border: "1px solid #ddd",
-                          textAlign: "center",
-                          height: "36px",
-                        }}
-                      >
-                        {file.receiver}
-                      </td>
-                      <td
-                        style={{
-                          padding: "6px",
-                          border: "1px solid #ddd",
-                          textAlign: "center",
-                          height: "36px",
-                        }}
-                      >
-                        {file.receiver_designation}
+                        {file.receiver}({file.receiver_designation})
                       </td>
                       <td
                         style={{
@@ -320,6 +297,16 @@ export default function Outboxfunc() {
                         }}
                       >
                         {convertDate(file.upload_date)}
+                      </td>
+                      <td
+                        style={{
+                          padding: "6px",
+                          border: "1px solid #ddd",
+                          textAlign: "center",
+                          height: "36px",
+                        }}
+                      >
+                        {file.uploader}
                       </td>
                       <td
                         style={{

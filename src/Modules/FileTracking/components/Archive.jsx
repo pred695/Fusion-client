@@ -236,9 +236,9 @@ export default function ArchiveFiles() {
                   <th style={{ ...tableStyles, width: "8%" }}>Unarchive</th>
                   {[
                     { key: "id", label: "File ID", width: "15%" },
-                    { key: "uploader", label: "Owner", width: "15%" },
                     { key: "subject", label: "Subject", width: "25%" },
                     { key: "upload_date", label: "Date", width: "15%" },
+                    { key: "uploader", label: "Created by", width: "15%" },
                   ].map(({ key, label, width }) => (
                     <th
                       key={key}
@@ -298,11 +298,11 @@ export default function ArchiveFiles() {
                           .toString()
                           .padStart(2, "0")}-#${file.id}`}
                       </td>
-                      <td style={tableStyles}>{file.uploader}</td>
                       <td style={tableStyles}>{file.subject}</td>
                       <td style={tableStyles}>
                         {convertDate(file.upload_date)}
                       </td>
+                      <td style={tableStyles}>{file.uploader}</td>
                       <td style={tableStyles}>
                         <ActionIcon
                           variant="outline"

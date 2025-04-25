@@ -276,7 +276,7 @@ export default function Outboxfunc() {
                           height: "36px",
                         }}
                       >
-                        {file.receiver}({file.receiver_designation})
+                        {file.receiver}[{file.receiver_designation}]
                       </td>
                       <td
                         style={{

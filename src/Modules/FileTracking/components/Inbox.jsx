@@ -370,7 +370,7 @@ export default function Inboxfunc() {
                           height: "36px",
                         }}
                       >
-                        {file.sent_by_user}({file.sent_by_designation})
+                        {file.sent_by_user}[{file.sent_by_designation}]
                       </td>
                       <td
                         style={{

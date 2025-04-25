@@ -44,8 +44,10 @@ export default function Compose() {
   let module = useSelector((state) => state.module.current_module);
   module = module.split(" ").join("").toLowerCase();
   const uploaderRole = useSelector((state) => state.user.role);
-  const [designation, setDesignation] = React.useState(uploaderRole);
-  const options = roles.map((role) => ({ value: role, label: role }));
+  const [designation, setDesignation] = React.useState("");
+  const options = Array.isArray(roles)
+    ? roles.map((role) => ({ value: role, label: role }))
+    : [];
   const receiverRoles = Array.isArray(receiver_designations)
     ? receiver_designations.map((role) => ({
         value: role,
@@ -376,7 +378,7 @@ export default function Compose() {
                 value={receiver_designation}
                 data={receiverRoles}
                 onChange={(value) => setReceiverDesignation(value)}
-                onClick={() => fetchRoles()} // only triggers on click
+                onClick={() => fetchRoles()}
                 searchable
                 nothingFound="No designations found"
                 styles={(theme) => ({

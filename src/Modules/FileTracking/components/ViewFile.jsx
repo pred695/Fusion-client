@@ -68,7 +68,12 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
         label: role,
       }))
     : [];
+  useEffect(() => {
+    setReceiverDesignation("");
+    setReceiverDesignations("");
+  }, [receiver_username]);
   const currentUser = useSelector((state) => state.user.roll_no);
+  const userDesignation = useSelector((state) => state.user.role);
   // Helper function to format dates
   const convertDate = (date) => {
     const d = new Date(date);
@@ -293,7 +298,10 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
         <Box mb="md">
           <TextInput
             label="File ID"
-            value={file?.id || "Not available"}
+            value={
+              `${file.branch}-${new Date(file.upload_date).getFullYear()}-${(new Date(file.upload_date).getMonth() + 1).toString().padStart(2, "0")}-#${file.id}` ||
+              "Not available"
+            }
             readOnly
           />
         </Box>
@@ -336,7 +344,8 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
       </div>
       {/* Tracking History of the File */}
       <Title order={4} mt="xl" mb="md">
-        Tracking History
+        Tracking History of{" "}
+        {`${file.branch}-${new Date(file.upload_date).getFullYear()}-${(new Date(file.upload_date).getMonth() + 1).toString().padStart(2, "0")}-#${file.id}`}
       </Title>
       <Box
         style={{
@@ -581,17 +590,14 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Select
+                key={receiver_username}
                 label="Receiver Designation"
                 placeholder="Select designation"
-                onClick={() => {
-                  if (receiverRoles.length === 0) {
-                    fetchRoles();
-                  }
-                }}
-                value={receiver_designation} // Use receiver_designation (string)
-                data={receiverRoles} // Ensure this is populated correctly
+                onClick={() => fetchRoles()}
+                value={receiver_designation}
+                data={receiverRoles}
                 onChange={(value) => setReceiverDesignation(value)}
-                searchable // Allows searching for designations
+                searchable
                 nothingFound="No designations found"
               />
             </Grid.Col>
@@ -667,9 +673,12 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
         centered
       >
         <Text weight={600}>Are you sure you want to forward this file?</Text>
-        <Text weight={600}>From: {file.uploader}</Text>
+        <Text weight={600}>Created By: {file.uploader}</Text>
+        <Text weight={600}>
+          From: {currentUser} [{userDesignation}]
+        </Text>
         <Text>
-          To: {receiver_username}({receiver_designation})
+          To: {receiver_username}[{receiver_designation}]
         </Text>
         {selectedForwardFile && (
           <>

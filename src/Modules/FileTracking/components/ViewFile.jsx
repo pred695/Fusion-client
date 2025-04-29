@@ -17,6 +17,7 @@ import {
   Autocomplete,
   Modal,
   Text,
+  Flex,
 } from "@mantine/core";
 import PropTypes from "prop-types";
 
@@ -43,7 +44,6 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
   // State management
   const [activeSection, setActiveSection] = useState(null);
   const [file, setFile] = useState({});
-  const [uploadedFile, setUploadedFile] = useState("");
   const [trackingHistory, setTrackingHistory] = useState([]);
   const [receiver_username, setReceiverUsername] = useState("");
   const [receiver_designation, setReceiverDesignation] = useState("");
@@ -58,6 +58,18 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
   const token = localStorage.getItem("authToken");
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [selectedForwardFile, setSelectedForwardFile] = useState(null);
+  const [fileContent, setFileContent] = useState([]);
+  const [remarksOpened, setRemarksOpened] = useState(false);
+
+  const downloadAttachment = (url) => {
+    window.open(`${host}${url}`, "_blank");
+  };
+
+  const previewRemarks = fileContent
+    .slice(0, 3)
+    .map((line) => `• ${line}`)
+    .join("\n");
+  const allRemarks = fileContent.map((line) => `• ${line}`).join("\n");
   const openForwardModal = (x) => {
     setSelectedForwardFile(x);
     setShowForwardModal(true);
@@ -89,39 +101,45 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
   };
 
   useEffect(() => {
-    const getFile = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${createFileRoute}${fileID}`, {
+        // Fetch file first
+        const fileResponse = await axios.get(`${createFileRoute}${fileID}`, {
           withCredentials: true,
           headers: {
             Authorization: `Token ${token}`,
           },
         });
-        setFile(response.data);
-        setSelectedForwardFile(response.data);
-        setUploadedFile(response.data.upload_file);
-        console.log("File: ", response.data);
-      } catch (err) {
-        console.error("Error fetching files:", err);
-      }
-    };
-    const getHistory = async () => {
-      try {
-        const response = await axios.get(`${historyRoute}${fileID}`, {
+        setFile(fileResponse.data);
+        setSelectedForwardFile(fileResponse.data);
+        // Fetch history after file is fetched
+        const historyResponse = await axios.get(`${historyRoute}${fileID}`, {
           withCredentials: true,
           headers: {
             Authorization: `Token ${token}`,
           },
         });
-        setTrackingHistory(response.data);
-        setCurrentReceiver(response.data[0].receiver_id);
-        console.log("Tracking: ", response.data);
+
+        const trackingData = historyResponse.data;
+        const contentArray = trackingData.map(
+          (track) =>
+            `On ${convertDate(track?.forward_date)}: ${track?.current_id}[${track?.sender_designation}] added remarks: ${track?.remarks}`,
+        );
+
+        trackingData[0].upload_file = fileResponse.data.upload_file;
+        setTrackingHistory(trackingData);
+        setCurrentReceiver(
+          trackingData[trackingData.length - 1]?.receiver_id ?? null,
+        );
+        setFileContent(contentArray);
+        console.log("Tracking: ", trackingData);
+        console.log("File content: ", contentArray);
       } catch (err) {
-        console.log("Error fetching tracking history");
+        console.error("Error fetching data:", err);
       }
     };
-    getFile();
-    getHistory();
+
+    fetchData();
   }, [fileID, token]);
   useEffect(() => {
     let isMounted = true;
@@ -253,9 +271,6 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
     }
   };
   // Handle file download
-  const downloadAttachment = (url) => {
-    window.open(`${host}${url}`, "_blank");
-  };
 
   return (
     <Card
@@ -271,40 +286,63 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
     >
       {/* File Details: ViewFile */}
       <div>
-        <Group position="apart" mb="lg">
-          <Button variant="subtle" onClick={onBack}>
-            <ArrowLeft size={20} />
-          </Button>
-          <Title order={3} style={{ textAlign: "center", flex: 1 }}>
+        <Flex
+          align="center"
+          justify="center"
+          mb="lg"
+          style={{ position: "relative" }}
+        >
+          <div style={{ position: "absolute", left: 0 }}>
+            <Button variant="subtle" onClick={onBack}>
+              <ArrowLeft size={20} />
+            </Button>
+          </div>
+          <Title
+            order={3}
+            style={{
+              fontSize: "26px",
+              textAlign: "center",
+            }}
+          >
             {file.branch}-{new Date(file.upload_date).getFullYear()}-
             {(new Date(file.upload_date).getMonth() + 1)
               .toString()
               .padStart(2, "0")}
             -#{file.id}
           </Title>
-        </Group>
+        </Flex>
 
         <Divider mb="lg" />
 
-        <Box mb="md">
+        <Box>
           <Textarea
-            label="File Content"
-            placeholder="No content available"
-            value={file?.description || ""}
+            label="File Description"
+            value={previewRemarks}
             readOnly
+            autosize
+            minRows={3}
+            onClick={() => setRemarksOpened(true)}
+            style={{ cursor: "pointer" }}
           />
         </Box>
 
-        <Box mb="md">
-          <TextInput
-            label="File ID"
-            value={
-              `${file.branch}-${new Date(file.upload_date).getFullYear()}-${(new Date(file.upload_date).getMonth() + 1).toString().padStart(2, "0")}-#${file.id}` ||
-              "Not available"
-            }
+        <Modal
+          opened={remarksOpened}
+          onClose={() => setRemarksOpened(false)}
+          title={`All remarks on ${file.branch}-${new Date(file.upload_date).getFullYear()}-
+            ${(new Date(file.upload_date).getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}
+            -#${file.id}`}
+          size="lg"
+        >
+          <Textarea
+            value={allRemarks}
             readOnly
+            autosize
+            minRows={Math.max(fileContent.length, 3)}
           />
-        </Box>
+        </Modal>
 
         <Box mb="md">
           <TextInput
@@ -320,16 +358,11 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
 
         <Box mb="md">
           <TextInput
-            label="Department"
-            value={file?.src_module || "Not available"}
-            readOnly
-          />
-        </Box>
-
-        <Box mb="md">
-          <TextInput
-            label="Sender"
-            value={file?.uploader || "Not available"}
+            label="Created By"
+            value={
+              `${file?.uploader} [${file?.uploader_designation}]` ||
+              "Not available"
+            }
             readOnly
           />
         </Box>
@@ -362,14 +395,14 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
             width: "100%",
             borderCollapse: "collapse",
             tableLayout: "fixed",
-            fontSize: "12px", // Reduced font size
+            fontSize: "12px",
           }}
         >
           <thead>
             <tr>
               <th
                 style={{
-                  padding: "8px", // Reduced padding
+                  padding: "8px",
                   width: "9%",
                   border: "1px solid #ddd",
                   textAlign: "center",
@@ -396,16 +429,6 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
                 }}
               >
                 Receiver
-              </th>
-              <th
-                style={{
-                  padding: "8px", // Reduced padding
-                  width: "13%",
-                  border: "1px solid #ddd",
-                  textAlign: "center",
-                }}
-              >
-                Designation
               </th>
               <th
                 style={{
@@ -450,34 +473,24 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
                     wordWrap: "break-word", // Prevent overflow
                   }}
                 >
-                  {track.current_id}
+                  {track.current_id}[{track.sender_designation}]
                 </td>
                 <td
                   style={{
-                    padding: "8px", // Reduced padding
+                    padding: "8px",
                     textAlign: "center",
                     border: "1px solid #ddd",
-                    wordWrap: "break-word", // Prevent overflow
+                    wordWrap: "break-word",
                   }}
                 >
-                  {track.receiver_id}
+                  {track.receiver_id}[{track.receive_design}]
                 </td>
                 <td
                   style={{
-                    padding: "8px", // Reduced padding
+                    padding: "8px",
                     textAlign: "center",
                     border: "1px solid #ddd",
-                    wordWrap: "break-word", // Prevent overflow
-                  }}
-                >
-                  {track.receive_design}
-                </td>
-                <td
-                  style={{
-                    padding: "8px", // Reduced padding
-                    textAlign: "center",
-                    border: "1px solid #ddd",
-                    wordWrap: "break-word", // Prevent overflow
+                    wordWrap: "break-word",
                     cursor: "pointer",
                   }}
                   onClick={() => handleOpenRemarksModal(track.remarks || "-")}
@@ -493,32 +506,22 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
                     border: "1px solid #ddd",
                   }}
                 >
-                  {(
-                    index === trackingHistory.length - 1
-                      ? uploadedFile
-                      : track.upload_file
-                  ) ? (
+                  {track.upload_file ? (
                     <Button
                       variant="subtle"
                       size="xs"
                       leftIcon={<DownloadSimple size={16} />}
-                      onClick={() =>
-                        downloadAttachment(
-                          index === trackingHistory.length - 1
-                            ? uploadedFile
-                            : track.upload_file,
-                        )
-                      }
+                      onClick={() => downloadAttachment(track.upload_file)}
                       style={{
                         display: "inline-block",
                         padding: "5px 10px",
-                        fontSize: "10px", // Reduced font size
+                        fontSize: "10px",
                       }}
                     >
                       Download
                     </Button>
                   ) : (
-                    "File not found"
+                    "No file found"
                   )}
                 </td>
               </tr>
@@ -555,9 +558,6 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
                   downloadAttachment(track.upload_file);
                 }
               });
-              if (file.upload_file) {
-                downloadAttachment(file.upload_file);
-              }
             }}
           >
             Download All Attachments
@@ -673,7 +673,9 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
         centered
       >
         <Text weight={600}>Are you sure you want to forward this file?</Text>
-        <Text weight={600}>Created By: {file.uploader}</Text>
+        <Text weight={600}>
+          Created By: {file.uploader}[{file.uploader_designation}]
+        </Text>
         <Text weight={600}>
           From: {currentUser} [{userDesignation}]
         </Text>

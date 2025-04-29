@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useState, useEffect } from "react";
@@ -50,7 +52,7 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
   const [receiver_designations, setReceiverDesignations] = useState("");
   const [current_receiver, setCurrentReceiver] = useState("");
   const [usernameSuggestions, setUsernameSuggestions] = useState([]);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [isForwarding, setIsForwarding] = useState(false);
   const [opened, setOpened] = useState(false);
@@ -286,31 +288,37 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
     >
       {/* File Details: ViewFile */}
       <div>
-        <Flex
-          align="center"
-          justify="center"
-          mb="lg"
-          style={{ position: "relative" }}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+            backgroundColor: "#FFFFFF",
+            padding: "10px 0",
+            borderBottom: "1px solid #E0E6ED",
+          }}
         >
-          <div style={{ position: "absolute", left: 0 }}>
-            <Button variant="subtle" onClick={onBack}>
-              <ArrowLeft size={20} />
-            </Button>
-          </div>
-          <Title
-            order={3}
-            style={{
-              fontSize: "26px",
-              textAlign: "center",
-            }}
-          >
-            {file.branch}-{new Date(file.upload_date).getFullYear()}-
-            {(new Date(file.upload_date).getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}
-            -#{file.id}
-          </Title>
-        </Flex>
+          <Flex align="center" justify="center" mb="lg">
+            <div style={{ position: "absolute", left: 0 }}>
+              <Button variant="subtle" onClick={onBack}>
+                <ArrowLeft size={20} />
+              </Button>
+            </div>
+            <Title
+              order={3}
+              style={{
+                fontSize: "26px",
+                textAlign: "center",
+              }}
+            >
+              {file.branch}-{new Date(file.upload_date).getFullYear()}-
+              {(new Date(file.upload_date).getMonth() + 1)
+                .toString()
+                .padStart(2, "0")}
+              -#{file.id}
+            </Title>
+          </Flex>
+        </div>
 
         <Divider mb="lg" />
 
@@ -330,9 +338,7 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
           opened={remarksOpened}
           onClose={() => setRemarksOpened(false)}
           title={`All remarks on ${file.branch}-${new Date(file.upload_date).getFullYear()}-
-            ${(new Date(file.upload_date).getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}
+            ${(new Date(file.upload_date).getMonth() + 1).toString().padStart(2, "0")}
             -#${file.id}`}
           size="lg"
         >
@@ -344,36 +350,37 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
           />
         </Modal>
 
-        <Box mb="md">
-          <TextInput
-            label="Upload Date"
-            value={
-              file?.upload_date
-                ? convertDate(file.upload_date)
-                : "Not available"
-            }
-            readOnly
-          />
-        </Box>
+        <Grid mb="md" gutter="auto">
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput
+              label="Upload Date"
+              value={
+                file?.upload_date
+                  ? convertDate(file.upload_date)
+                  : "Not available"
+              }
+              readOnly
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput
+              label="Created By"
+              value={
+                `${file?.uploader} [${file?.uploader_designation}]` ||
+                "Not available"
+              }
+              readOnly
+            />
+          </Grid.Col>
+        </Grid>
 
-        <Box mb="md">
-          <TextInput
-            label="Created By"
-            value={
-              `${file?.uploader} [${file?.uploader_designation}]` ||
-              "Not available"
-            }
-            readOnly
-          />
-        </Box>
-
-        <Box mb="md">
+        {/* <Box mb="md">
           <TextInput
             label="Attachment"
             value={file?.upload_file?.split("/").pop() || "No attachment"}
             readOnly
           />
-        </Box>
+        </Box> */}
       </div>
       {/* Tracking History of the File */}
       <Title order={4} mt="xl" mb="md">
@@ -647,7 +654,7 @@ export default function ViewFile({ onBack, fileID, updateFiles }) {
             >
               Forward File
             </Button>
-            {files && (
+            {files && files.length > 0 && (
               // <Group position="apart" mt="sm">
               <Button
                 leftIcon={<Trash size={16} />}

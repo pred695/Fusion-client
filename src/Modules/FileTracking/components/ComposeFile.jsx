@@ -346,8 +346,8 @@ export default function Compose() {
             </Button>
           </Group>
         )}
-        <Grid mb="sm" gutter="md" align="flex-start">
-          <Grid.Col span={{ base: 12, sm: 6 }}>
+        <Grid mb="sm" gutter="auto" align="flex-start">
+          <Grid.Col span={{ base: 12, sm: 6, md: 6 }}>
             <Box style={{ height: "100%", width: "98.5%", marginLeft: "8px" }}>
               <Autocomplete
                 label="Send To"

@@ -31,6 +31,7 @@ axios.defaults.withCredentials = true;
 export default function Compose() {
   const [files, setFiles] = React.useState([]);
   const [usernameSuggestions, setUsernameSuggestions] = React.useState([]);
+  const username = useSelector((state) => state.user.roll_no);
   const [receiver_username, setReceiverUsername] = React.useState("");
   const [receiver_designation, setReceiverDesignation] = React.useState("");
   const [receiver_designations, setReceiverDesignations] = React.useState("");
@@ -207,6 +208,7 @@ export default function Compose() {
       formData.append("receiver_username", receiver_username);
       formData.append("receiver_designation", receiver_designation);
       formData.append("src_module", module);
+      formData.append("remarks", remarks);
       const response = await axios.post(`${createFileRoute}`, formData, {
         headers: {
           Authorization: `Token ${token}`,
@@ -421,9 +423,11 @@ export default function Compose() {
         <Text weight={600} mb="ls">
           Do you want to send this file?
         </Text>
-        <Text mb="ls">Sender: ({designation})</Text>
+        <Text mb="ls">
+          Sender: {username}[{designation}]{" "}
+        </Text>
         <Text mb="md">
-          Receiver: {receiver_username} ({receiver_designation})
+          Receiver: {receiver_username} [{receiver_designation}]
         </Text>
         <Group justify="center" gap="xl" style={{ width: "100%" }}>
           <Button

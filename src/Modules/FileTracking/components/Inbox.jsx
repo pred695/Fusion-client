@@ -230,6 +230,8 @@ export default function Inboxfunc() {
             mb="md"
             style={{
               fontSize: "26px",
+              textAlign: "center",
+              width: "100%",
             }}
           >
             {selectedFile.subject}
@@ -400,7 +402,7 @@ export default function Inboxfunc() {
                           height: "36px",
                         }}
                       >
-                        {file.uploader}
+                        {file.uploader}[{file.uploader_designation}]
                       </td>
                       <td
                         style={{

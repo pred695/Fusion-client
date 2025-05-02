@@ -179,7 +179,7 @@ export default function Outboxfunc() {
           style={{
             border: "1px solid #ddd",
             borderRadius: "8px",
-            overflowY: "hidden",
+            overflowY: "auto",
             height: "calc(57vh - 20px)",
             minHeight: "300px",
             backgroundColor: "#fff",
@@ -188,7 +188,7 @@ export default function Outboxfunc() {
             marginBottom: 0,
           }}
         >
-          <div style={{ flex: 1, overflowY: "hidden", marginBottom: "-1px" }}>
+          <div style={{ flex: 1, overflowY: "auto", marginBottom: "-1px" }}>
             <Table
               highlightOnHover
               style={{

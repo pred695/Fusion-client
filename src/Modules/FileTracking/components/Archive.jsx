@@ -156,7 +156,7 @@ export default function ArchiveFiles() {
         width: "90vw",
         display: "flex",
         flexDirection: "column",
-        overflowY: selectedFile ? "auto" : "hidden",
+        overflowY: "auto",
       }}
     >
       {!selectedFile && (
@@ -207,7 +207,7 @@ export default function ArchiveFiles() {
           style={{
             border: "1px solid #ddd",
             borderRadius: "8px",
-            overflowY: "hidden",
+            overflowY: "auto",
             height: "calc(53vh - 20px)",
             minHeight: "300px",
             backgroundColor: "#fff",
@@ -216,7 +216,7 @@ export default function ArchiveFiles() {
             marginBottom: 0,
           }}
         >
-          <div style={{ flex: 1, overflowY: "hidden", marginBottom: "-1px" }}>
+          <div style={{ flex: 1, overflowY: "auto", marginBottom: "-1px" }}>
             <Table
               highlightOnHover
               style={{

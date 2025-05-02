@@ -251,7 +251,7 @@ export default function Draft() {
           width: "90vw",
           display: "flex",
           flexDirection: "column",
-          overflowY: "hidden",
+          overflowY: "auto",
         }}
       >
         {!editFile && (
@@ -288,7 +288,7 @@ export default function Draft() {
             style={{
               border: "1px solid #ddd",
               borderRadius: "8px",
-              overflowY: "hidden",
+              overflowY: "auto",
               height: "calc(57vh - 20px)",
               minHeight: "300px",
               backgroundColor: "#fff",
@@ -297,7 +297,7 @@ export default function Draft() {
               marginBottom: 0,
             }}
           >
-            <div style={{ flex: 1, overflowY: "hidden", marginBottom: "-1px" }}>
+            <div style={{ flex: 1, overflowY: "auto", marginBottom: "-1px" }}>
               <Table
                 highlightOnHover
                 style={{

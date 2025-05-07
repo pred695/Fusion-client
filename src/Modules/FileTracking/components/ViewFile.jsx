@@ -5,7 +5,6 @@ import {
   Button,
   Title,
   Group,
-  Table,
   FileInput,
   Select,
   Box,
@@ -25,6 +24,9 @@ import {
   Tooltip,
   Skeleton,
   useMantineTheme,
+  SegmentedControl,
+  Table,
+  Center,
 } from "@mantine/core";
 import PropTypes from "prop-types";
 import { notifications } from "@mantine/notifications";
@@ -46,6 +48,8 @@ import {
   ChatCircleText,
   ChatCenteredText,
   ClockCounterClockwise,
+  Table as TableIcon,
+  ListBullets,
 } from "@phosphor-icons/react";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "@mantine/hooks";
@@ -85,10 +89,14 @@ export default function ViewFile({
   const [remarksOpened, setRemarksOpened] = useState(false);
   const [loading, setLoading] = useState(true);
   const [historyExpanded, setHistoryExpanded] = useState(true);
+  // New state for view type
+  const [viewType, setViewType] = useState("table");
 
   // Theme and responsive design
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
+  // eslint-disable-next-line no-unused-vars
+  const isTablet = useMediaQuery(`(max-width: ${theme.breakpoints.md})`);
 
   const downloadAttachment = (url) => {
     window.open(`${host}${url}`, "_blank");
@@ -331,72 +339,134 @@ export default function ViewFile({
     }
   };
 
-  // Render mobile timeline instead of table for better UX on small screens
-  const renderMobileTimeline = () => {
-    return (
-      <Timeline
-        active={trackingHistory.length - 1}
-        bulletSize={24}
-        lineWidth={2}
-      >
-        {trackingHistory.map((track, index) => (
-          <Timeline.Item
-            key={index}
-            bullet={<ArrowsClockwise size={12} />}
-            title={
-              <Group spacing="xs">
-                <Text weight={500}>{track.current_id}</Text>
-                <Badge size="sm">{track.sender_designation}</Badge>
-                <Text size="xs" color="dimmed">
-                  {convertDate(track.forward_date)}
-                </Text>
-              </Group>
-            }
-          >
-            <Text size="sm" mb={5}>
-              To:{" "}
-              <Text span weight={500}>
-                {track.receiver_id}
-              </Text>{" "}
-              [{track.receive_design}]
-            </Text>
+  // Render timeline view for all device sizes
+  const renderTimelineView = () => {
+    const bulletSize = isMobile ? 24 : 28;
+    const lineWidth = isMobile ? 2 : 3;
 
-            {track.remarks && (
+    return (
+      <ScrollArea
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          tableLayout: "fixed",
+          fontSize: "12px",
+          minWidth: "700px",
+        }}
+      >
+        <Timeline
+          active={trackingHistory.length - 1}
+          bulletSize={bulletSize}
+          lineWidth={lineWidth}
+          sx={{
+            padding: isMobile ? "0.5rem" : "1rem",
+            "& .mantine-Timeline-item": {
+              marginBottom: isMobile ? "1rem" : "1.5rem",
+            },
+          }}
+        >
+          {trackingHistory.map((track, index) => (
+            <Timeline.Item
+              key={index}
+              bullet={
+                <Avatar
+                  radius="xl"
+                  size={bulletSize}
+                  color={index === trackingHistory.length - 1 ? "blue" : "gray"}
+                >
+                  <ArrowsClockwise size={bulletSize / 2} />
+                </Avatar>
+              }
+              title={
+                <Group spacing="xs" noWrap align="center">
+                  <Text weight={600} size={isMobile ? "sm" : "md"}>
+                    {track.current_id}
+                  </Text>
+                  <Badge
+                    size={isMobile ? "sm" : "md"}
+                    color="blue"
+                    variant="light"
+                  >
+                    {track.sender_designation}
+                  </Badge>
+                </Group>
+              }
+            >
+              <Text
+                color="dimmed"
+                size={isMobile ? "xs" : "sm"}
+                mb={isMobile ? 5 : 8}
+              >
+                {convertDate(track.forward_date)}
+              </Text>
+
               <Paper
                 p="xs"
                 withBorder
-                mb={5}
-                onClick={() => handleOpenRemarksModal(track.remarks)}
+                mb={10}
+                style={{ background: "#f8f9fa" }}
               >
-                <Text size="sm" lineClamp={2}>
-                  <Text span weight={500} mr={5}>
-                    Remarks:
+                <Group mb={5}>
+                  <Text weight={500} size={isMobile ? "xs" : "sm"}>
+                    To:
                   </Text>
-                  {track.remarks}
-                </Text>
-              </Paper>
-            )}
+                  <Text size={isMobile ? "xs" : "sm"}>
+                    <Text span weight={500}>
+                      {track.receiver_id}
+                    </Text>{" "}
+                    [{track.receive_design}]
+                  </Text>
+                </Group>
 
-            {track.upload_file && (
-              <Button
-                variant="light"
-                size="xs"
-                leftIcon={<DownloadSimple size={16} />}
-                onClick={() => downloadAttachment(track.upload_file)}
-                fullWidth
-                mt={5}
-              >
-                Download Attachment
-              </Button>
-            )}
-          </Timeline.Item>
-        ))}
-      </Timeline>
+                {track.remarks && (
+                  <Box mt={8}>
+                    <Text weight={500} size={isMobile ? "xs" : "sm"} mb={5}>
+                      Remarks:
+                    </Text>
+                    <Paper
+                      p="xs"
+                      withBorder
+                      style={{
+                        backgroundColor: "#fff",
+                        cursor: "pointer",
+                        borderLeft: "3px solid #228be6",
+                      }}
+                      onClick={() => handleOpenRemarksModal(track.remarks)}
+                    >
+                      <Text size={isMobile ? "xs" : "sm"} lineClamp={2}>
+                        {track.remarks}
+                      </Text>
+                      {track.remarks.length > 100 && (
+                        <Text size="xs" color="blue" mt={3}>
+                          Click to read more
+                        </Text>
+                      )}
+                    </Paper>
+                  </Box>
+                )}
+              </Paper>
+
+              {track.upload_file && (
+                <Button
+                  variant="light"
+                  size={isMobile ? "xs" : "sm"}
+                  leftIcon={<DownloadSimple size={isMobile ? 14 : 16} />}
+                  onClick={() => downloadAttachment(track.upload_file)}
+                  fullWidth={isMobile}
+                  style={{ maxWidth: isMobile ? "100%" : "200px" }}
+                >
+                  Download Attachment
+                </Button>
+              )}
+            </Timeline.Item>
+          ))}
+        </Timeline>
+      </ScrollArea>
     );
   };
 
-  // Render desktop table view for tracking history
-  const renderDesktopTable = () => {
+  // Render tabular view (only for desktop)
+  const renderTabularView = () => {
     return (
       <ScrollArea>
         <Table
@@ -754,6 +824,7 @@ export default function ViewFile({
             borderBottom: historyExpanded ? "1px solid #dee2e6" : "none",
           }}
           onClick={() => setHistoryExpanded(!historyExpanded)}
+          sx={{ cursor: "pointer" }}
         >
           <Group>
             <ClockCounterClockwise size={20} />
@@ -761,16 +832,53 @@ export default function ViewFile({
               order={4}
               style={{ margin: 0, fontSize: isMobile ? "16px" : "18px" }}
             >
-              Tracking History
+              Tracking History of {generateFileId(file)}
             </Title>
           </Group>
-          <ActionIcon variant="subtle">
-            {historyExpanded ? <CaretUp size={16} /> : <CaretDown size={16} />}
-          </ActionIcon>
+          <Group>
+            {/* View Type Selector - Only show on desktop */}
+            {!isMobile && historyExpanded && (
+              <SegmentedControl
+                value={viewType}
+                onChange={setViewType}
+                data={[
+                  {
+                    value: "table",
+                    label: (
+                      <Center>
+                        <TableIcon size={16} style={{ marginRight: 8 }} />
+                        <Text size="sm">Table</Text>
+                      </Center>
+                    ),
+                  },
+                  {
+                    value: "timeline",
+                    label: (
+                      <Center>
+                        <ListBullets size={16} style={{ marginRight: 8 }} />
+                        <Text size="sm">Timeline</Text>
+                      </Center>
+                    ),
+                  },
+                ]}
+                size="xs"
+                radius="md"
+                onClick={(e) => e.stopPropagation()}
+                style={{ marginRight: 10 }}
+              />
+            )}
+            <ActionIcon variant="subtle">
+              {historyExpanded ? (
+                <CaretUp size={16} />
+              ) : (
+                <CaretDown size={16} />
+              )}
+            </ActionIcon>
+          </Group>
         </Flex>
 
         <Collapse in={historyExpanded}>
-          <Box p="md">
+          <Box p={isMobile ? "xs" : "md"}>
             {loading ? (
               <>
                 <Skeleton height={50} radius="sm" mb={10} />
@@ -778,9 +886,13 @@ export default function ViewFile({
                 <Skeleton height={50} radius="sm" />
               </>
             ) : isMobile ? (
-              renderMobileTimeline()
+              // Mobile always shows timeline view
+              renderTimelineView()
+            ) : // Desktop shows selected view type
+            viewType === "timeline" ? (
+              renderTimelineView()
             ) : (
-              renderDesktopTable()
+              renderTabularView()
             )}
           </Box>
         </Collapse>

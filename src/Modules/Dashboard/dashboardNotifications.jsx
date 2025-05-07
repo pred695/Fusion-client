@@ -44,12 +44,13 @@ function NotificationItem({
       <Paper
         radius="md"
         px="lg"
-        ml="lg"
+        ml={{ md: "lg", base: "0" }}
         pt="sm"
         pb="xl"
+        mb="lg"
         style={{ borderLeft: "0.6rem solid #15ABFF" }}
         withBorder
-        maw="85%"
+        maw={{ base: "100%", md: "85%" }}
       >
         <Flex justify="space-between">
           <Flex direction="column">
@@ -389,18 +390,32 @@ function Dashboard() {
             .length === 0 ? (
           <Empty />
         ) : (
-          sortedNotifications
-            .filter((notification) => !notification.deleted)
-            .map((notification) => (
-              <NotificationItem
-                notification={notification}
-                key={notification.id}
-                markAsRead={markAsRead}
-                markAsUnread={markAsUnread}
-                deleteNotification={deleteNotification}
-                loading={read_Loading}
-              />
-            ))
+          <>
+            <NotificationItem
+              notification={sortedNotifications[0]}
+              key={sortedNotifications[0].id}
+              markAsRead={markAsRead}
+              markAsUnread={markAsUnread}
+              deleteNotification={deleteNotification}
+              loading={read_Loading}
+            />
+            <NotificationItem
+              notification={sortedNotifications[0]}
+              key={sortedNotifications[0].id}
+              markAsRead={markAsRead}
+              markAsUnread={markAsUnread}
+              deleteNotification={deleteNotification}
+              loading={read_Loading}
+            />
+            <NotificationItem
+              notification={sortedNotifications[0]}
+              key={sortedNotifications[0].id}
+              markAsRead={markAsRead}
+              markAsUnread={markAsUnread}
+              deleteNotification={deleteNotification}
+              loading={read_Loading}
+            />
+          </>
         )}
       </Grid>
     </>

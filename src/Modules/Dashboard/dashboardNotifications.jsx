@@ -390,32 +390,18 @@ function Dashboard() {
             .length === 0 ? (
           <Empty />
         ) : (
-          <>
-            <NotificationItem
-              notification={sortedNotifications[0]}
-              key={sortedNotifications[0].id}
-              markAsRead={markAsRead}
-              markAsUnread={markAsUnread}
-              deleteNotification={deleteNotification}
-              loading={read_Loading}
-            />
-            <NotificationItem
-              notification={sortedNotifications[0]}
-              key={sortedNotifications[0].id}
-              markAsRead={markAsRead}
-              markAsUnread={markAsUnread}
-              deleteNotification={deleteNotification}
-              loading={read_Loading}
-            />
-            <NotificationItem
-              notification={sortedNotifications[0]}
-              key={sortedNotifications[0].id}
-              markAsRead={markAsRead}
-              markAsUnread={markAsUnread}
-              deleteNotification={deleteNotification}
-              loading={read_Loading}
-            />
-          </>
+          sortedNotifications
+            .filter((notification) => !notification.deleted)
+            .map((notification) => (
+              <NotificationItem
+                notification={notification}
+                key={notification.id}
+                markAsRead={markAsRead}
+                markAsUnread={markAsUnread}
+                deleteNotification={deleteNotification}
+                loading={read_Loading}
+              />
+            ))
         )}
       </Grid>
     </>
